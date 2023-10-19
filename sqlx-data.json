@@ -1,0 +1,201 @@
+{
+  "db": "PostgreSQL",
+  "4abd181880121faa82c9b2b1ef2a4f2f028680e270436be2b740ad4e404874fc": {
+    "describe": {
+      "columns": [
+        {
+          "name": "name",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "value",
+          "ordinal": 1,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "SELECT name, value FROM config;"
+  },
+  "6044e4d6d5bc6d4625f74f4f1b8307796819b0763322c5c81c42a3a7e82d61ab": {
+    "describe": {
+      "columns": [
+        {
+          "name": "value",
+          "ordinal": 0,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT value FROM config WHERE name = $1 LIMIT 1;"
+  },
+  "b1b3e18793e04ca03109bdade11575950f460587610bb3a936a176c992dde104": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "key",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "size",
+          "ordinal": 2,
+          "type_info": "Int4"
+        },
+        {
+          "name": "hash",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "select\n      f.id,\n      f.key,\n      f.size,\n      f.hash,\n      f.updated_at,\n      f.created_at\n    from\n      file f\n    where f.key = $1;"
+  },
+  "e4d4318bc33e7ce733ac47812bf4b3d6a3fd87d259d908580be720d408fdf438": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "key",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "hash",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "size",
+          "ordinal": 3,
+          "type_info": "Int4"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Int4"
+        ]
+      }
+    },
+    "query": "insert into file (key, hash, size) values ($1, $2, $3) returning *;"
+  },
+  "ff393d74c509f73fc4e1947236520fb554a69bb23824bfe49efc00c52a1016fc": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id!",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "key!",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "size!",
+          "ordinal": 2,
+          "type_info": "Int4"
+        },
+        {
+          "name": "hash!",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "updated_at!",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "created_at!",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "select 0 as \"id!\", f.key as \"key!\", sum(f.size)::integer as \"size!\", '' as \"hash!\", max(f.updated_at) as \"updated_at!\", min(f.created_at) as \"created_at!\" from (\n      select\n        concat($1, split_part(f.key, '/', 1)) as key,\n        f.size,\n        f.updated_at,\n        f.created_at\n      from (\n        select\n          substring(f.key, length($1) + 1) as key,\n          f.size as size,\n          f.updated_at as updated_at,\n          f.created_at as created_at\n        from\n          file f\n        where f.key ~ $2\n      ) f\n    ) f\n    group by f.key\n    union\n    select\n      f.id,\n      f.key,\n      f.size,\n      f.hash,\n      f.updated_at,\n      f.created_at\n    from\n      file f\n    where f.key ~ $3;"
+  }
+}

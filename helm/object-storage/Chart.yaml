@@ -1,0 +1,6 @@
+apiVersion: v2
+name: aicacia-object_storage_api
+description: aicacia object_storage api
+type: application
+version: 0.1.0
+appVersion: latest
