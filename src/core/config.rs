@@ -25,7 +25,7 @@ pub fn get_config() -> Arc<Config> {
 pub struct ServerConfig {
   pub address: Option<IpAddr>,
   pub port: u16,
-  pub uri: Option<String>,
+  pub uri: String,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -37,10 +37,18 @@ pub struct FilesConfig {
 
 #[derive(Debug, Deserialize, Default)]
 #[allow(unused)]
+pub struct JWTConfig {
+  pub secret: String,
+  pub expires_in_seconds: usize,
+}
+
+#[derive(Debug, Deserialize, Default)]
+#[allow(unused)]
 pub struct Config {
   pub server: ServerConfig,
   pub files: FilesConfig,
   pub log_level: String,
+  pub jwt: JWTConfig,
 }
 
 impl Config {

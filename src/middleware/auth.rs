@@ -3,7 +3,7 @@ use std::{
   sync::Arc,
 };
 
-use crate::service::config::get_config;
+use crate::{core::config::get_config, service::access::get_access_by_id};
 use actix_web::{
   body::EitherBody,
   dev::{Service, ServiceRequest, ServiceResponse, Transform},
@@ -93,9 +93,28 @@ where
             }
           };
 
-          let secret = get_config(pool.as_ref(), "jwt.secret").await.to_string();
-          let token_data = match Claims::parse(jwt, &secret) {
+          let token_data = match Claims::parse(jwt, &get_config().jwt.secret) {
             Ok(c) => c,
+            Err(err) => {
+              log::error!("Error parsing token: {}", err);
+              let res = req
+                .into_response(
+                  HttpResponse::Unauthorized().json(Errors::from("invalid_authorization")),
+                )
+                .map_into_right_body();
+              return Ok(res);
+            }
+          };
+
+          let access = match get_access_by_id(pool.as_ref(), &token_data.claims.sub).await {
+            Ok(Some(a)) => a,
+            Ok(None) => {
+              log::error!("Error missing access");
+              let res = req
+                .into_response(HttpResponse::Unauthorized().json(Errors::from("access_not_found")))
+                .map_into_right_body();
+              return Ok(res);
+            }
             Err(err) => {
               log::error!("Error: {}", err);
               let res = req
@@ -107,7 +126,7 @@ where
             }
           };
 
-          req.extensions_mut().insert(token_data.claims);
+          req.extensions_mut().insert(access);
         }
       }
 

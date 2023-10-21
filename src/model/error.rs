@@ -14,6 +14,8 @@ use validator::{ValidationError, ValidationErrors, ValidationErrorsKind};
 const GLOBAL_KEY: &str = "global";
 const INTERNAL_ERROR: &str = "internal_error";
 const NOT_FOUND_ERROR: &str = "not_found";
+const UNAUTHORIZED: &str = "unauthorized";
+const FORBIDDEN: &str = "forbidden";
 
 lazy_static! {
   static ref RE_BETWEEN_TICKS: Regex = Regex::new(r"`(.*)`").expect("Failed to compile regex");
@@ -105,6 +107,14 @@ impl Errors {
 
   pub fn not_found() -> Self {
     Self::from(NOT_FOUND_ERROR)
+  }
+
+  pub fn unauthorized() -> Self {
+    Self::from(UNAUTHORIZED)
+  }
+
+  pub fn forbidden() -> Self {
+    Self::from(FORBIDDEN)
   }
 
   pub fn internal_error() -> Self {

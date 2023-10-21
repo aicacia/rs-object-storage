@@ -1,5 +1,13 @@
 use rand::Rng;
 
+pub fn random_password(size: usize) -> String {
+  rand::thread_rng()
+    .sample_iter(&rand::distributions::Alphanumeric)
+    .take(size)
+    .map(char::from)
+    .collect()
+}
+
 pub fn generate_salt(salt: &mut [u8]) -> &[u8] {
   rand::thread_rng().fill(salt);
   salt

@@ -10,6 +10,7 @@ use std::path::Path;
 
 use crate::{
   core::config::get_config,
+  middleware::auth::Authorization,
   model::{
     error::Errors,
     files::{File, FileQuery, FileUploadRequest, FilesAndFoldersQuery},
@@ -30,6 +31,9 @@ use crate::{
     (status = 401, description = "Unauthorized", body = Errors),
     (status = 403, description = "Forbidden", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors),
+  ),
+  security(
+    ("Authorization" = [])
   )
 )]
 #[get("/list")]
@@ -59,6 +63,9 @@ pub async fn index(
     (status = 401, description = "Unauthorized", body = Errors),
     (status = 403, description = "Forbidden", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors)
+  ),
+  security(
+    ("Authorization" = [])
   )
 )]
 #[get("")]
@@ -84,6 +91,9 @@ pub async fn show(pool: Data<Pool<Postgres>>, query: Query<FileQuery>) -> impl R
     (status = 401, description = "Unauthorized", body = Errors),
     (status = 403, description = "Forbidden", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors),
+  ),
+  security(
+    ("Authorization" = [])
   )
 )]
 #[post("")]
@@ -131,6 +141,9 @@ pub async fn create(
     (status = 403, description = "Forbidden", body = Errors),
     (status = 404, description = "File not found", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors),
+  ),
+  security(
+    ("Authorization" = [])
   )
 )]
 #[put("")]
@@ -182,6 +195,9 @@ pub async fn edit(
     (status = 401, description = "Unauthorized", body = Errors),
     (status = 403, description = "Forbidden", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors)
+  ),
+  security(
+    ("Authorization" = [])
   )
 )]
 #[get("/contents")]
@@ -214,6 +230,7 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
   |config: &mut ServiceConfig| {
     config.service(
       scope("/files")
+        .wrap(Authorization)
         .service(index)
         .service(show)
         .service(create)
