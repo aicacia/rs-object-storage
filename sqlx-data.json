@@ -1,5 +1,200 @@
 {
   "db": "PostgreSQL",
+  "15097928f3f9421cdbcd2e74907f7c268016ee8b659572ce4fd065e7f5ab161d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "key",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "hash",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "size",
+          "ordinal": 3,
+          "type_info": "Int4"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Int4"
+        ]
+      }
+    },
+    "query": "insert into file (key, hash, size)\n    values ($1, $2, $3)\n    returning *;"
+  },
+  "29c150b5e5d61d5ce5522c3c2c8fab202b8d06c0afcbf75b51393db8e9d37205": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "key",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "hash",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "size",
+          "ordinal": 3,
+          "type_info": "Int4"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Varchar",
+          "Int4"
+        ]
+      }
+    },
+    "query": "update file set hash = $2, size = $3 where key = $1 returning *;"
+  },
+  "2be34290461eee8ca18ccde7d20e6f3eb293143de5481d70bc98945d9ad8b786": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "encrypted_secret",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "admin",
+          "ordinal": 2,
+          "type_info": "Bool"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar"
+        ]
+      }
+    },
+    "query": "update access\n    set encrypted_secret = $2, enabled = true\n    where id = $1\n    returning id, encrypted_secret, admin, created_at, updated_at;"
+  },
+  "41ca099f5d49eb48fdd85eaf46f012d47a8d595b817523381f2f254ecb1d8837": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "encrypted_secret",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "admin",
+          "ordinal": 2,
+          "type_info": "Bool"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Bool"
+        ]
+      }
+    },
+    "query": "insert into access (id, encrypted_secret, admin)\n    values ($1, $2, $3)\n    returning id, encrypted_secret, admin, created_at, updated_at;"
+  },
   "4abd181880121faa82c9b2b1ef2a4f2f028680e270436be2b740ad4e404874fc": {
     "describe": {
       "columns": [
@@ -24,25 +219,61 @@
     },
     "query": "SELECT name, value FROM config;"
   },
-  "6044e4d6d5bc6d4625f74f4f1b8307796819b0763322c5c81c42a3a7e82d61ab": {
+  "5363a00aa2459683432c3f636c0e6ffd4c56c78ea399937f2fabd2f3c727cf96": {
     "describe": {
       "columns": [
         {
-          "name": "value",
+          "name": "id",
           "ordinal": 0,
-          "type_info": "Jsonb"
+          "type_info": "Uuid"
+        },
+        {
+          "name": "encrypted_secret",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "admin",
+          "ordinal": 2,
+          "type_info": "Bool"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
+        false,
+        false,
+        false,
         false
       ],
       "parameters": {
         "Left": [
-          "Text"
+          "Uuid"
         ]
       }
     },
-    "query": "SELECT value FROM config WHERE name = $1 LIMIT 1;"
+    "query": "select a.id, a.encrypted_secret, a.admin, a.created_at, a.updated_at from access a where a.id = $1 and a.enabled = true;"
+  },
+  "adc334b8c348949b47dd7e7148bb1ee79dc4524bba41d8041513b68f35239e3b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update access set enabled = false where id = $1;"
   },
   "b1b3e18793e04ca03109bdade11575950f460587610bb3a936a176c992dde104": {
     "describe": {
@@ -93,58 +324,6 @@
       }
     },
     "query": "select\n      f.id,\n      f.key,\n      f.size,\n      f.hash,\n      f.updated_at,\n      f.created_at\n    from\n      file f\n    where f.key = $1;"
-  },
-  "e4d4318bc33e7ce733ac47812bf4b3d6a3fd87d259d908580be720d408fdf438": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int4"
-        },
-        {
-          "name": "key",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "hash",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "size",
-          "ordinal": 3,
-          "type_info": "Int4"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 4,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Varchar",
-          "Int4"
-        ]
-      }
-    },
-    "query": "insert into file (key, hash, size) values ($1, $2, $3) returning *;"
   },
   "ff393d74c509f73fc4e1947236520fb554a69bb23824bfe49efc00c52a1016fc": {
     "describe": {

@@ -1,5 +1,5 @@
 use actix_web::{
-  patch, post,
+  delete, patch, post,
   web::Path,
   web::{scope, Data, ServiceConfig},
   HttpResponse, Responder,
@@ -15,7 +15,7 @@ use crate::{
     access::{AccessRequest, AccessRow, CreateAccessRequest},
     error::Errors,
   },
-  service::access::{create_access, reset_access, validate_access},
+  service::access::{create_access, delete_access, reset_access, validate_access},
 };
 
 #[utoipa::path(
@@ -94,7 +94,7 @@ pub async fn create(
     ("Authorization" = [])
   )
 )]
-#[patch("/{id}")]
+#[patch("/{id}/reset")]
 pub async fn reset(
   pool: Data<Pool<Postgres>>,
   access: AccessRow,
@@ -111,12 +111,45 @@ pub async fn reset(
   HttpResponse::Ok().json(access_with_exposed_secret)
 }
 
+#[utoipa::path(
+  context_path = "/access",
+  responses(
+    (status = 204, description = "Deletes access"),
+    (status = 401, description = "Unauthorized", body = Errors),
+    (status = 403, description = "Forbidden", body = Errors),
+    (status = 500, description = "Internal Server Error", body = Errors),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+#[delete("/{id}")]
+pub async fn delete(
+  pool: Data<Pool<Postgres>>,
+  access: AccessRow,
+  path: Path<Uuid>,
+) -> impl Responder {
+  let id = path.into_inner();
+  if !access.admin && access.id != id {
+    return HttpResponse::Forbidden().json(Errors::forbidden());
+  }
+  match delete_access(pool.as_ref(), &id).await {
+    Ok(d) => d,
+    Err(_) => return HttpResponse::InternalServerError().json(Errors::internal_error()),
+  };
+  HttpResponse::NoContent().finish()
+}
+
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
   |config: &mut ServiceConfig| {
     config.service(
-      scope("/access")
-        .service(create_token)
-        .service(scope("").wrap(Authorization).service(create).service(reset)),
+      scope("/access").service(create_token).service(
+        scope("")
+          .wrap(Authorization)
+          .service(create)
+          .service(reset)
+          .service(delete),
+      ),
     );
   }
 }

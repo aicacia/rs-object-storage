@@ -11,7 +11,7 @@ pub async fn get_access_by_id(pool: &Pool<Postgres>, id: &Uuid) -> Result<Option
   Ok(
     sqlx::query_as!(
       AccessRow,
-      r#"select a.id, a.encrypted_secret, a.admin, a.created_at, a.updated_at from access a where a.id = $1;"#,
+      r#"select a.id, a.encrypted_secret, a.admin, a.created_at, a.updated_at from access a where a.id = $1 and a.enabled = true;"#,
       id,
     )
     .fetch_optional(pool)
@@ -66,7 +66,7 @@ pub async fn reset_access(pool: &Pool<Postgres>, id: &Uuid) -> Result<AccessWith
   let access = sqlx::query_as!(
     AccessRow,
     r#"update access
-    set encrypted_secret = $2
+    set encrypted_secret = $2, enabled = true
     where id = $1
     returning id, encrypted_secret, admin, created_at, updated_at;"#,
     id,
@@ -81,4 +81,15 @@ pub async fn reset_access(pool: &Pool<Postgres>, id: &Uuid) -> Result<AccessWith
     created_at: access.created_at,
     updated_at: access.updated_at,
   })
+}
+
+pub async fn delete_access(pool: &Pool<Postgres>, id: &Uuid) -> Result<bool> {
+  let result = sqlx::query_as!(
+    AccessRow,
+    r#"update access set enabled = false where id = $1;"#,
+    id
+  )
+  .execute(pool)
+  .await?;
+  Ok(result.rows_affected() > 0)
 }

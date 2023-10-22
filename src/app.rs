@@ -32,6 +32,7 @@ use crate::controller::{access, files, util};
     access::create_token,
     access::create,
     access::reset,
+    access::delete,
   ),
   components(
     schemas(
