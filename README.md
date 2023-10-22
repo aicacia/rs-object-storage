@@ -1,7 +1,7 @@
 # Aicacia Object Storage API
 
 [![license](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue")](LICENSE-MIT)
-[![Test Status](https://github.com/aicacia/rs-object_storage/workflows/Tests/badge.svg?event=push)](https://github.com/nathanfaucett/rs-object_storage/actions)
+[![Test Status](https://github.com/aicacia/rs-object-storage/actions/workflows/test.yml/badge.svg)](https://github.com/aicacia/rs-object_storage/actions)
 
 aicacia object_storage api
 
