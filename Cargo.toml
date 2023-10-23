@@ -1,13 +1,13 @@
 [package]
+authors = ["nathanfaucett@gmail.com"]
 default-run = "object_storage"
 description = "Aicacia Object Storage"
 edition = "2021"
 license = "MIT/Apache-2.0"
 name = "object_storage"
-object_storageors = ["nathanfaucett@gmail.com"]
 readme = "README.md"
 repository = ""
-rust-version = "1.72"
+rust-version = "1.73"
 version = "0.1.0"
 
 [dependencies]

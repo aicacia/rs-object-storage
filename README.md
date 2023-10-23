@@ -29,3 +29,8 @@ aicacia object_storage api
 
 - drop the database `sqlx database drop`
 - revert migrations `sqlx migrate revert`
+
+## Docker
+
+- `docker build -t ghcr.io/aicacia/rs-object-storage:latest .`
+- `docker push ghcr.io/aicacia/rs-object-storage:latest`

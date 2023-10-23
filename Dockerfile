@@ -16,6 +16,7 @@ COPY . .
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
 FROM alpine:3.18
+LABEL org.opencontainers.image.source=https://github.com/aicacia/rs-object-storage
 
 WORKDIR /app
 
