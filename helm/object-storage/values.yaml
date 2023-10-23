@@ -4,25 +4,22 @@ replicas:
   resource:
     cpu:
       utilization: 90
+    memory:
+      utilization: 90
 
 image:
-  repository: ghcr.io/aicacia/object_storage
+  repository: ghcr.io/aicacia/rs-object-storage
   tag: latest
   pullPolicy: Always
   hash: sha256:13ba025b6c186da3fdce3db68f192721fef8300ae02f2ae76c953d771b7180e4
 
-app:
-  port: 3000
-  log_level: info
-  url: api.object-storage.aicacia.com
-  jwt:
-    secret: secret
-  database:
-    url: postgres://postgres:postgres@localhost:5432/postgres
-  mail:
-    relay: ""
-    username: ""
-    password: ""
+env:
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+
+storage:
+  className: manual
+  capacity: 10Gi
+  hostPath: /opt/object-storage
 
 ingress:
   enabled: true

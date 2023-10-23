@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "aicacia-object_storage_api.fullname" . }}-persistent-volume-claim
+  labels:
+    {{- include "aicacia-object_storage_api.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.storage.className }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.storage.capacity }}
