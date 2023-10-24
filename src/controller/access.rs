@@ -9,8 +9,11 @@ use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 use crate::{
-  core::{config::get_config, jwt::Claims},
-  middleware::auth::Authorization,
+  core::{
+    config::get_config,
+    jwt::{encode_jwt, AccessClaims},
+  },
+  middleware::auth::AccessAuthorization,
   model::{
     access::{AccessRequest, AccessRow, CreateAccessRequest},
     error::Errors,
@@ -22,7 +25,7 @@ use crate::{
   context_path = "/access",
   request_body = AccessRequest,
   responses(
-    (status = 200, description = "Created a new access id/secret", body = AccessWithExposedSecret),
+    (status = 200, description = "Created a new access id/secret", content_type="text/plain", body = String),
     (status = 401, description = "Unauthorized", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors),
   )
@@ -35,14 +38,15 @@ pub async fn create_token(pool: Data<Pool<Postgres>>, body: Json<AccessRequest>)
     Err(_) => return HttpResponse::InternalServerError().json(Errors::internal_error()),
   };
   let config = get_config();
-  let jwt: String = match Claims::new(
-    access.id,
-    chrono::Utc::now().timestamp() as usize,
-    config.jwt.expires_in_seconds,
-    &config.server.uri,
-  )
-  .encode(&config.jwt.secret)
-  {
+  let jwt: String = match encode_jwt(
+    &AccessClaims::new(
+      access.id,
+      chrono::Utc::now().timestamp() as usize,
+      config.jwt.expires_in_seconds,
+      &config.server.uri,
+    ),
+    &config.jwt.secret,
+  ) {
     Ok(jwt) => jwt,
     Err(e) => {
       log::error!("{}", e);
@@ -62,7 +66,7 @@ pub async fn create_token(pool: Data<Pool<Postgres>>, body: Json<AccessRequest>)
     (status = 500, description = "Internal Server Error", body = Errors),
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[post("")]
@@ -91,7 +95,7 @@ pub async fn create(
     (status = 500, description = "Internal Server Error", body = Errors),
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[patch("/{id}/reset")]
@@ -120,7 +124,7 @@ pub async fn reset(
     (status = 500, description = "Internal Server Error", body = Errors),
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[delete("/{id}")]
@@ -145,7 +149,7 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
     config.service(
       scope("/access").service(create_token).service(
         scope("")
-          .wrap(Authorization)
+          .wrap(AccessAuthorization)
           .service(create)
           .service(reset)
           .service(delete),

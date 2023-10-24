@@ -74,6 +74,26 @@ pub async fn get_file_by_key(pool: &Pool<Postgres>, key: &str) -> Result<Option<
   Ok(file)
 }
 
+pub async fn get_file_by_id(pool: &Pool<Postgres>, id: i32) -> Result<Option<FileRow>> {
+  let file = sqlx::query_as!(
+    FileRow,
+    r#"select
+      f.id,
+      f.key,
+      f.size,
+      f.hash,
+      f.updated_at,
+      f.created_at
+    from
+      file f
+    where f.id = $1;"#,
+    id,
+  )
+  .fetch_optional(pool)
+  .await?;
+  Ok(file)
+}
+
 pub fn get_file_key_sha256(key: &str) -> String {
   let mut hasher = Sha256::new();
   hasher.update(key.as_bytes());

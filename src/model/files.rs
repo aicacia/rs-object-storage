@@ -47,6 +47,12 @@ pub struct FileQuery {
   pub key: String,
 }
 
+#[derive(Serialize, Deserialize, Clone, ToSchema, Validate)]
+pub struct SignedTokenRequest {
+  pub expires: DateTime<Utc>,
+  pub key: String,
+}
+
 #[derive(MultipartForm, ToSchema)]
 #[multipart(deny_unknown_fields, duplicate_field = "deny")]
 pub struct FileUploadRequest {

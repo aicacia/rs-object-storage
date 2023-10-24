@@ -2,22 +2,26 @@ use actix_files::NamedFile;
 use actix_multipart::form::MultipartForm;
 use actix_web::{
   get, post, put,
-  web::{scope, Data, Query, ServiceConfig},
+  web::{self, scope, Data, Query, ServiceConfig},
   HttpRequest, HttpResponse, Responder,
 };
+use actix_web_validator::Json;
 use sqlx::{Pool, Postgres};
 use std::path::Path;
 
 use crate::{
-  core::config::get_config,
-  middleware::auth::Authorization,
+  core::{
+    config::get_config,
+    jwt::{encode_jwt, parse_jwt, SignedTokenClaims},
+  },
+  middleware::auth::AccessAuthorization,
   model::{
     error::Errors,
-    files::{File, FileQuery, FileUploadRequest, FilesAndFoldersQuery},
+    files::{File, FileQuery, FileUploadRequest, FilesAndFoldersQuery, SignedTokenRequest},
   },
   service::files::{
-    copy_file_and_hash, create_file, get_file_by_key, get_file_key_sha256, get_files_and_folders,
-    update_file,
+    copy_file_and_hash, create_file, get_file_by_id, get_file_by_key, get_file_key_sha256,
+    get_files_and_folders, update_file,
   },
 };
 
@@ -33,7 +37,7 @@ use crate::{
     (status = 500, description = "Internal Server Error", body = Errors),
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[get("/list")]
@@ -65,7 +69,7 @@ pub async fn index(
     (status = 500, description = "Internal Server Error", body = Errors)
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[get("")]
@@ -93,7 +97,7 @@ pub async fn show(pool: Data<Pool<Postgres>>, query: Query<FileQuery>) -> impl R
     (status = 500, description = "Internal Server Error", body = Errors),
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[post("")]
@@ -143,7 +147,7 @@ pub async fn create(
     (status = 500, description = "Internal Server Error", body = Errors),
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[put("")]
@@ -197,7 +201,7 @@ pub async fn edit(
     (status = 500, description = "Internal Server Error", body = Errors)
   ),
   security(
-    ("Authorization" = [])
+    ("AccessAuthorization" = [])
   )
 )]
 #[get("/contents")]
@@ -226,16 +230,107 @@ pub async fn contents(
   named_file.into_response(&req)
 }
 
+#[utoipa::path(
+  context_path = "/files",
+  request_body = SignedTokenRequest,
+  responses(
+    (status = 200, description = "Created a new signed token", content_type="text/plain", body = String),
+    (status = 401, description = "Unauthorized", body = Errors),
+    (status = 500, description = "Internal Server Error", body = Errors),
+  ),
+  security(
+    ("AccessAuthorization" = [])
+  )
+)]
+#[post("/signed-token")]
+pub async fn signed_token(
+  pool: Data<Pool<Postgres>>,
+  body: Json<SignedTokenRequest>,
+) -> impl Responder {
+  let file = match get_file_by_key(pool.as_ref(), &body.key).await {
+    Ok(Some(f)) => f,
+    Ok(None) => return HttpResponse::NotFound().json(Errors::not_found()),
+    Err(e) => {
+      log::error!("Failed to get file by key: {}", e);
+      return HttpResponse::InternalServerError().json(Errors::internal_error());
+    }
+  };
+  let config = get_config();
+  let jwt: String = match encode_jwt(
+    &SignedTokenClaims::new(
+      file.id,
+      chrono::Utc::now().timestamp() as usize,
+      body.expires.timestamp() as usize,
+      &config.server.uri,
+    ),
+    &config.jwt.secret,
+  ) {
+    Ok(jwt) => jwt,
+    Err(e) => {
+      log::error!("{}", e);
+      return HttpResponse::InternalServerError().json(Errors::internal_error());
+    }
+  };
+  HttpResponse::Ok().content_type("text/plain").body(jwt)
+}
+
+#[utoipa::path(
+  context_path = "/files",
+  responses(
+    (status = 200, description = "Fetched file contents", body = [u8], content_type = "application/octet-stream"),
+    (status = 401, description = "Unauthorized", body = Errors),
+    (status = 403, description = "Forbidden", body = Errors),
+    (status = 500, description = "Internal Server Error", body = Errors)
+  )
+)]
+#[get("/{signed_token}")]
+pub async fn signed_token_contents(
+  req: HttpRequest,
+  pool: Data<Pool<Postgres>>,
+  path: web::Path<String>,
+) -> impl Responder {
+  let jwt = path.into_inner();
+  let token_data = match parse_jwt::<SignedTokenClaims>(&jwt, &get_config().jwt.secret) {
+    Ok(c) => c,
+    Err(err) => {
+      log::error!("Error parsing token: {}", err);
+      return HttpResponse::Unauthorized().json(Errors::unauthorized());
+    }
+  };
+
+  let config = get_config();
+  let file = match get_file_by_id(pool.as_ref(), token_data.claims.file_id).await {
+    Ok(Some(f)) => f,
+    Ok(None) => return HttpResponse::NotFound().json(Errors::not_found()),
+    Err(e) => {
+      log::error!("Failed to get file by key: {}", e);
+      return HttpResponse::InternalServerError().json(Errors::internal_error());
+    }
+  };
+  let path = Path::new(&config.files.files_folder).join(get_file_key_sha256(&file.key));
+  let named_file = match NamedFile::open(path) {
+    Ok(f) => f,
+    Err(e) => {
+      log::error!("Failed to open file: {}", e);
+      return HttpResponse::InternalServerError().json(Errors::internal_error());
+    }
+  };
+  named_file.into_response(&req)
+}
+
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
   |config: &mut ServiceConfig| {
     config.service(
-      scope("/files")
-        .wrap(Authorization)
-        .service(index)
-        .service(show)
-        .service(create)
-        .service(edit)
-        .service(contents),
+      scope("/files").service(signed_token_contents).service(
+        scope("")
+          .wrap(AccessAuthorization)
+          .service(index)
+          .service(show)
+          .service(create)
+          .service(edit)
+          .service(contents)
+          .service(signed_token),
+      ),
     );
   }
 }

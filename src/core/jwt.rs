@@ -1,45 +1,72 @@
 use anyhow::Result;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::encryption::random_password;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Claims {
+pub struct AccessClaims {
   pub exp: usize,
   pub iat: usize,
   pub iss: String,
   pub nonce: String,
-  pub sub: Uuid,
+  pub access_id: Uuid,
 }
 
-impl Claims {
-  pub fn new(sub: Uuid, now_in_seconds: usize, expires_in_seconds: usize, iss: &str) -> Self {
+impl AccessClaims {
+  pub fn new(access_id: Uuid, now_in_seconds: usize, expires_in_seconds: usize, iss: &str) -> Self {
     Self {
       exp: now_in_seconds + expires_in_seconds,
       iat: now_in_seconds,
       iss: iss.to_owned(),
       nonce: random_password(32),
-      sub,
+      access_id,
     }
   }
+}
 
-  pub fn parse(jwt: &str, secret: &str) -> Result<TokenData<Self>> {
-    let token_data = decode::<Self>(
-      jwt,
-      &DecodingKey::from_secret(secret.as_bytes()),
-      &Validation::default(),
-    )?;
-    Ok(token_data)
-  }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SignedTokenClaims {
+  pub exp: usize,
+  pub iat: usize,
+  pub iss: String,
+  pub nonce: String,
+  pub file_id: i32,
+}
 
-  pub fn encode(&self, secret: &str) -> Result<String> {
-    let jwt = encode(
-      &Header::default(),
-      self,
-      &EncodingKey::from_secret(secret.as_bytes()),
-    )?;
-    Ok(jwt)
+impl SignedTokenClaims {
+  pub fn new(file_id: i32, now_in_seconds: usize, expires_in_seconds: usize, iss: &str) -> Self {
+    Self {
+      exp: now_in_seconds + expires_in_seconds,
+      iat: now_in_seconds,
+      iss: iss.to_owned(),
+      nonce: random_password(32),
+      file_id,
+    }
   }
+}
+
+pub fn parse_jwt<T>(jwt: &str, secret: &str) -> Result<TokenData<T>>
+where
+  T: DeserializeOwned,
+{
+  let token_data = decode::<T>(
+    jwt,
+    &DecodingKey::from_secret(secret.as_bytes()),
+    &Validation::default(),
+  )?;
+  Ok(token_data)
+}
+
+pub fn encode_jwt<T>(claims: &T, secret: &str) -> Result<String>
+where
+  T: Serialize,
+{
+  let jwt = encode(
+    &Header::default(),
+    claims,
+    &EncodingKey::from_secret(secret.as_bytes()),
+  )?;
+  Ok(jwt)
 }

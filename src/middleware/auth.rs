@@ -13,11 +13,14 @@ use actix_web::{
 use futures::future::LocalBoxFuture;
 use sqlx::{Pool, Postgres};
 
-use crate::{core::jwt::Claims, model::error::Errors};
+use crate::{
+  core::jwt::{parse_jwt, AccessClaims},
+  model::error::Errors,
+};
 
-pub struct Authorization;
+pub struct AccessAuthorization;
 
-impl<S, B> Transform<S, ServiceRequest> for Authorization
+impl<S, B> Transform<S, ServiceRequest> for AccessAuthorization
 where
   S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = actix_web::Error> + 'static,
   S::Future: 'static,
@@ -26,21 +29,21 @@ where
   type Response = ServiceResponse<EitherBody<B>>;
   type Error = actix_web::Error;
   type InitError = ();
-  type Transform = AuthorizationMiddleware<S>;
+  type Transform = AccessAuthorizationMiddleware<S>;
   type Future = Ready<Result<Self::Transform, Self::InitError>>;
 
   fn new_transform(&self, service: S) -> Self::Future {
-    future::ready(Ok(AuthorizationMiddleware {
+    future::ready(Ok(AccessAuthorizationMiddleware {
       service: Arc::new(service),
     }))
   }
 }
 
-pub struct AuthorizationMiddleware<S> {
+pub struct AccessAuthorizationMiddleware<S> {
   service: Arc<S>,
 }
 
-impl<S, B> Service<ServiceRequest> for AuthorizationMiddleware<S>
+impl<S, B> Service<ServiceRequest> for AccessAuthorizationMiddleware<S>
 where
   S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = actix_web::Error> + 'static,
   S::Future: 'static,
@@ -74,9 +77,7 @@ where
             Err(err) => {
               log::error!("Error: {}", err);
               let res = req
-                .into_response(
-                  HttpResponse::Unauthorized().json(Errors::from("invalid_authorization")),
-                )
+                .into_response(HttpResponse::Unauthorized().json(Errors::unauthorized()))
                 .map_into_right_body();
               return Ok(res);
             }
@@ -93,20 +94,18 @@ where
             }
           };
 
-          let token_data = match Claims::parse(jwt, &get_config().jwt.secret) {
+          let token_data = match parse_jwt::<AccessClaims>(jwt, &get_config().jwt.secret) {
             Ok(c) => c,
             Err(err) => {
               log::error!("Error parsing token: {}", err);
               let res = req
-                .into_response(
-                  HttpResponse::Unauthorized().json(Errors::from("invalid_authorization")),
-                )
+                .into_response(HttpResponse::Unauthorized().json(Errors::unauthorized()))
                 .map_into_right_body();
               return Ok(res);
             }
           };
 
-          let access = match get_access_by_id(pool.as_ref(), &token_data.claims.sub).await {
+          let access = match get_access_by_id(pool.as_ref(), &token_data.claims.access_id).await {
             Ok(Some(a)) => a,
             Ok(None) => {
               log::error!("Error missing access");
@@ -118,9 +117,7 @@ where
             Err(err) => {
               log::error!("Error: {}", err);
               let res = req
-                .into_response(
-                  HttpResponse::Unauthorized().json(Errors::from("invalid_authorization")),
-                )
+                .into_response(HttpResponse::Unauthorized().json(Errors::unauthorized()))
                 .map_into_right_body();
               return Ok(res);
             }
