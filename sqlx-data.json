@@ -325,6 +325,56 @@
     },
     "query": "select\n      f.id,\n      f.key,\n      f.size,\n      f.hash,\n      f.updated_at,\n      f.created_at\n    from\n      file f\n    where f.key = $1;"
   },
+  "d89350c0a5d9cf324d878c0147795353f06502c45c955999fe766f27fc9258ce": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "key",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "size",
+          "ordinal": 2,
+          "type_info": "Int4"
+        },
+        {
+          "name": "hash",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "select\n      f.id,\n      f.key,\n      f.size,\n      f.hash,\n      f.updated_at,\n      f.created_at\n    from\n      file f\n    where f.id = $1;"
+  },
   "ff393d74c509f73fc4e1947236520fb554a69bb23824bfe49efc00c52a1016fc": {
     "describe": {
       "columns": [
