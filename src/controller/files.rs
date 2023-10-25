@@ -256,11 +256,13 @@ pub async fn signed_token(
     }
   };
   let config = get_config();
+  let now = chrono::Utc::now().timestamp();
+  let expires_in_seconds = body.expires.timestamp() - now;
   let jwt: String = match encode_jwt(
     &SignedTokenClaims::new(
       file.id,
-      chrono::Utc::now().timestamp() as usize,
-      body.expires.timestamp() as usize,
+      chrono::Utc::now().timestamp(),
+      expires_in_seconds,
       &config.server.uri,
     ),
     &config.jwt.secret,
@@ -294,7 +296,7 @@ pub async fn signed_token_contents(
     Ok(c) => c,
     Err(err) => {
       log::error!("Error parsing token: {}", err);
-      return HttpResponse::Unauthorized().json(Errors::unauthorized());
+      return HttpResponse::NotFound().json(Errors::unauthorized());
     }
   };
 

@@ -41,7 +41,7 @@ pub async fn create_token(pool: Data<Pool<Postgres>>, body: Json<AccessRequest>)
   let jwt: String = match encode_jwt(
     &AccessClaims::new(
       access.id,
-      chrono::Utc::now().timestamp() as usize,
+      chrono::Utc::now().timestamp(),
       config.jwt.expires_in_seconds,
       &config.server.uri,
     ),

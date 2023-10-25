@@ -7,15 +7,15 @@ use super::encryption::random_password;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AccessClaims {
-  pub exp: usize,
-  pub iat: usize,
+  pub exp: i64,
+  pub iat: i64,
   pub iss: String,
   pub nonce: String,
   pub access_id: Uuid,
 }
 
 impl AccessClaims {
-  pub fn new(access_id: Uuid, now_in_seconds: usize, expires_in_seconds: usize, iss: &str) -> Self {
+  pub fn new(access_id: Uuid, now_in_seconds: i64, expires_in_seconds: i64, iss: &str) -> Self {
     Self {
       exp: now_in_seconds + expires_in_seconds,
       iat: now_in_seconds,
@@ -28,15 +28,15 @@ impl AccessClaims {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SignedTokenClaims {
-  pub exp: usize,
-  pub iat: usize,
+  pub exp: i64,
+  pub iat: i64,
   pub iss: String,
   pub nonce: String,
   pub file_id: i32,
 }
 
 impl SignedTokenClaims {
-  pub fn new(file_id: i32, now_in_seconds: usize, expires_in_seconds: usize, iss: &str) -> Self {
+  pub fn new(file_id: i32, now_in_seconds: i64, expires_in_seconds: i64, iss: &str) -> Self {
     Self {
       exp: now_in_seconds + expires_in_seconds,
       iat: now_in_seconds,

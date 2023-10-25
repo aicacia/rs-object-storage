@@ -67,7 +67,7 @@ where
       match req.headers().get("authorization") {
         None => {
           let res = req
-            .into_response(HttpResponse::Unauthorized().json(Errors::from("missing_authorization")))
+            .into_response(HttpResponse::Unauthorized().json(Errors::unauthorized()))
             .map_into_right_body();
           return Ok(res);
         }
@@ -94,6 +94,7 @@ where
             }
           };
 
+          log::info!("jwt {}", jwt);
           let token_data = match parse_jwt::<AccessClaims>(jwt, &get_config().jwt.secret) {
             Ok(c) => c,
             Err(err) => {
@@ -110,7 +111,7 @@ where
             Ok(None) => {
               log::error!("Error missing access");
               let res = req
-                .into_response(HttpResponse::Unauthorized().json(Errors::from("access_not_found")))
+                .into_response(HttpResponse::Unauthorized().json(Errors::unauthorized()))
                 .map_into_right_body();
               return Ok(res);
             }

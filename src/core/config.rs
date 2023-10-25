@@ -39,7 +39,7 @@ pub struct FilesConfig {
 #[allow(unused)]
 pub struct JWTConfig {
   pub secret: String,
-  pub expires_in_seconds: usize,
+  pub expires_in_seconds: i64,
 }
 
 #[derive(Debug, Deserialize, Default)]
