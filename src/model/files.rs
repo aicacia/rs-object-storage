@@ -39,17 +39,20 @@ impl From<FileRow> for File {
 
 #[derive(Serialize, Deserialize, Clone, IntoParams, Validate)]
 pub struct FilesAndFoldersQuery {
+  #[validate(length(min = 1, max = 4096))]
   pub key: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, IntoParams, Validate)]
 pub struct FileQuery {
+  #[validate(length(min = 1, max = 4096))]
   pub key: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Validate)]
 pub struct SignedTokenRequest {
   pub expires: DateTime<Utc>,
+  #[validate(length(min = 1, max = 4096))]
   pub key: String,
 }
 

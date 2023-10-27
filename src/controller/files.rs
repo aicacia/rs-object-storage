@@ -263,7 +263,7 @@ pub async fn signed_token(
       file.id,
       chrono::Utc::now().timestamp(),
       expires_in_seconds,
-      &config.server.uri,
+      config.server.uri.clone(),
     ),
     &config.jwt.secret,
   ) {
@@ -281,7 +281,6 @@ pub async fn signed_token(
   responses(
     (status = 200, description = "Fetched file contents", body = [u8], content_type = "application/octet-stream"),
     (status = 401, description = "Unauthorized", body = Errors),
-    (status = 403, description = "Forbidden", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors)
   )
 )]
@@ -296,7 +295,7 @@ pub async fn signed_token_contents(
     Ok(c) => c,
     Err(err) => {
       log::error!("Error parsing token: {}", err);
-      return HttpResponse::NotFound().json(Errors::unauthorized());
+      return HttpResponse::Unauthorized().json(Errors::unauthorized());
     }
   };
 

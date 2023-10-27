@@ -1,7 +1,7 @@
 use crate::model::error::Errors;
 use crate::{
   core::openapi::SecurityAddon, model::access as access_model, model::error as error_model,
-  model::files as files_model, model::util as util_model,
+  model::files as files_model, model::uploads as uploads_model, model::util as util_model,
 };
 use actix_cors::Cors;
 use actix_web::{
@@ -17,7 +17,7 @@ use sqlx::{Pool, Postgres};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::controller::{access, files, util};
+use crate::controller::{access, files, uploads, util};
 
 #[derive(OpenApi)]
 #[openapi(
@@ -35,6 +35,9 @@ use crate::controller::{access, files, util};
     access::create,
     access::reset,
     access::delete,
+    uploads::create,
+    uploads::upload_part,
+    uploads::finish,
   ),
   components(
     schemas(
@@ -49,6 +52,8 @@ use crate::controller::{access, files, util};
       access_model::AccessRequest,
       access_model::CreateAccessRequest,
       access_model::AccessWithExposedSecret,
+      uploads_model::UploadRequest,
+      uploads_model::UploadPartRequest,
     )
   ),
   tags(
@@ -91,6 +96,7 @@ pub fn create_app(
     .configure(util::configure())
     .configure(files::configure())
     .configure(access::configure())
+    .configure(uploads::configure())
     .service(
       SwaggerUi::new("/api-docs/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()),
     )
