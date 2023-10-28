@@ -20,7 +20,7 @@ use crate::{
     files::{File, FileQuery, FileUploadRequest, FilesAndFoldersQuery, SignedTokenRequest},
   },
   service::files::{
-    copy_file_and_hash, create_file, get_file_by_id, get_file_by_key, get_file_key_sha256,
+    copy_file_path_and_hash, create_file, get_file_by_id, get_file_by_key, get_file_key_sha256,
     get_files_and_folders, update_file,
   },
 };
@@ -115,9 +115,8 @@ pub async fn create(
     return HttpResponse::BadRequest().json(Errors::from("file_exists"));
   }
 
-  let size = payload.file.size;
-  let hash = match copy_file_and_hash(payload.file.file.path(), &dest_path).await {
-    Ok(h) => h,
+  let (hash, size) = match copy_file_path_and_hash(payload.file.file.path(), &dest_path).await {
+    Ok((h, s)) => (h, s),
     Err(e) => {
       log::error!("Error copying file: {}", e);
       return HttpResponse::InternalServerError().json(Errors::internal_error());
@@ -168,9 +167,8 @@ pub async fn edit(
 
   let dest_path = Path::new(&config.files.files_folder).join(get_file_key_sha256(&file.key));
 
-  let size = payload.file.size;
-  let hash = match copy_file_and_hash(payload.file.file.path(), &dest_path).await {
-    Ok(h) => h,
+  let (hash, size) = match copy_file_path_and_hash(payload.file.file.path(), &dest_path).await {
+    Ok((h, s)) => (h, s),
     Err(e) => {
       log::error!("Error copying file: {}", e);
       return HttpResponse::InternalServerError().json(Errors::internal_error());
@@ -277,14 +275,13 @@ pub async fn signed_token(
 }
 
 #[utoipa::path(
-  context_path = "/files",
   responses(
     (status = 200, description = "Fetched file contents", body = [u8], content_type = "application/octet-stream"),
     (status = 401, description = "Unauthorized", body = Errors),
     (status = 500, description = "Internal Server Error", body = Errors)
   )
 )]
-#[get("/{signed_token}")]
+#[get("/signed-token/{signed_token}")]
 pub async fn signed_token_contents(
   req: HttpRequest,
   pool: Data<Pool<Postgres>>,
@@ -321,17 +318,15 @@ pub async fn signed_token_contents(
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
   |config: &mut ServiceConfig| {
-    config.service(
-      scope("/files").service(signed_token_contents).service(
-        scope("")
-          .wrap(AccessAuthorization)
-          .service(index)
-          .service(show)
-          .service(create)
-          .service(edit)
-          .service(contents)
-          .service(signed_token),
-      ),
+    config.service(signed_token_contents).service(
+      scope("/files")
+        .wrap(AccessAuthorization)
+        .service(index)
+        .service(show)
+        .service(create)
+        .service(edit)
+        .service(contents)
+        .service(signed_token),
     );
   }
 }

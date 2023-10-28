@@ -101,14 +101,40 @@ pub fn get_file_key_sha256(key: &str) -> String {
   hex::encode(result)
 }
 
-// TODO: add a custom copy future that copies files and hashes at the same time
-pub async fn copy_file_and_hash(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<String> {
-  tokio::fs::copy(from.as_ref(), to.as_ref()).await?;
+pub async fn copy_file_path_and_hash(
+  from: impl AsRef<Path>,
+  to: impl AsRef<Path>,
+) -> Result<(String, u64)> {
   let mut hasher = Sha256::new();
-  let mut file = File::open(to.as_ref())?;
-  io::copy(&mut file, &mut hasher)?;
+  let size = copy_file_and_hash(
+    &mut hasher,
+    tokio::fs::OpenOptions::new()
+      .read(true)
+      .open(from.as_ref())
+      .await?,
+    &mut tokio::fs::OpenOptions::new()
+      .create(true)
+      .truncate(true)
+      .write(true)
+      .read(true)
+      .open(to.as_ref())
+      .await?,
+  )
+  .await?;
   let hash = hex::encode(hasher.finalize());
-  Ok(hash)
+  Ok((hash, size))
+}
+
+// TODO: add a custom copy future that copies files and hashes at the same time
+pub async fn copy_file_and_hash(
+  hasher: &mut Sha256,
+  mut from_file: tokio::fs::File,
+  to_file: &mut tokio::fs::File,
+) -> Result<u64> {
+  let size = tokio::io::copy(&mut from_file, to_file).await?;
+  let mut std_to_file = from_file.into_std().await;
+  io::copy(&mut std_to_file, hasher)?;
+  Ok(size)
 }
 
 pub async fn create_file(
@@ -117,18 +143,19 @@ pub async fn create_file(
   hash: &str,
   size: i32,
 ) -> Result<FileRow> {
-  let file = sqlx::query_as!(
-    FileRow,
-    r#"insert into file (key, hash, size)
-    values ($1, $2, $3)
-    returning *;"#,
-    key,
-    hash,
-    size
+  Ok(
+    sqlx::query_as!(
+      FileRow,
+      r#"insert into file (key, hash, size)
+        values ($1, $2, $3)
+        returning *;"#,
+      key,
+      hash,
+      size
+    )
+    .fetch_one(pool)
+    .await?,
   )
-  .fetch_one(pool)
-  .await?;
-  Ok(file)
 }
 
 pub async fn update_file(
@@ -137,14 +164,37 @@ pub async fn update_file(
   hash: &str,
   size: i32,
 ) -> Result<FileRow> {
-  let file = sqlx::query_as!(
-    FileRow,
-    r#"update file set hash = $2, size = $3 where key = $1 returning *;"#,
-    key,
-    hash,
-    size
+  Ok(
+    sqlx::query_as!(
+      FileRow,
+      r#"update file set hash = $2, size = $3 where key = $1 returning *;"#,
+      key,
+      hash,
+      size
+    )
+    .fetch_one(pool)
+    .await?,
   )
-  .fetch_one(pool)
-  .await?;
-  Ok(file)
+}
+
+pub async fn upsert_file(
+  pool: &Pool<Postgres>,
+  key: &str,
+  hash: &str,
+  size: i32,
+) -> Result<FileRow> {
+  Ok(
+    sqlx::query_as!(
+      FileRow,
+      r#"insert into file (key, hash, size)
+        values ($1, $2, $3)
+        on conflict (key) do update set hash = $2, size = $3
+        returning *;"#,
+      key,
+      hash,
+      size
+    )
+    .fetch_one(pool)
+    .await?,
+  )
 }

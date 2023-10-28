@@ -3,10 +3,12 @@ use std::path::Path;
 use actix_multipart::form::MultipartForm;
 use actix_web::{
   post, put,
-  web::{self, scope, ServiceConfig},
+  web::{self, scope, Data, ServiceConfig},
   HttpResponse, Responder,
 };
 use actix_web_validator::Json;
+use sha2::{Digest, Sha256};
+use sqlx::{Pool, Postgres};
 
 use crate::{
   core::{
@@ -16,9 +18,10 @@ use crate::{
   middleware::auth::AccessAuthorization,
   model::{
     error::Errors,
+    files::File,
     uploads::{UploadPartRequest, UploadRequest},
   },
-  service::files::copy_file_and_hash,
+  service::files::{copy_file_and_hash, copy_file_path_and_hash, get_file_key_sha256, upsert_file},
 };
 
 #[utoipa::path(
@@ -95,8 +98,8 @@ pub async fn upload_part(
     .join(token_data.claims.sha256())
     .join(part.to_string());
 
-  let hash = match copy_file_and_hash(payload.file.file.path(), &upload_part_path).await {
-    Ok(h) => h,
+  let hash = match copy_file_path_and_hash(payload.file.file.path(), &upload_part_path).await {
+    Ok((h, _)) => h,
     Err(e) => {
       log::error!("Error copying file: {}", e);
       return HttpResponse::InternalServerError().json(Errors::internal_error());
@@ -115,7 +118,7 @@ pub async fn upload_part(
   )
 )]
 #[post("/{jwt}/finish")]
-pub async fn finish(path: web::Path<String>) -> impl Responder {
+pub async fn finish(pool: Data<Pool<Postgres>>, path: web::Path<String>) -> impl Responder {
   let config = get_config();
   let jwt = path.into_inner();
   let token_data = match parse_jwt::<UploadClaims>(&jwt, &config.jwt.secret) {
@@ -125,7 +128,8 @@ pub async fn finish(path: web::Path<String>) -> impl Responder {
       return HttpResponse::Unauthorized().json(Errors::unauthorized());
     }
   };
-  let dest_path = Path::new(&config.files.files_folder).join(&token_data.claims.key);
+  let dest_path =
+    Path::new(&config.files.files_folder).join(get_file_key_sha256(&token_data.claims.key));
   let upload_parts_path = Path::new(&config.files.uploads_folder).join(token_data.claims.sha256());
 
   let mut parts: Vec<usize> = vec![];
@@ -144,12 +148,70 @@ pub async fn finish(path: web::Path<String>) -> impl Responder {
   }
   parts.sort();
 
+  match tokio::fs::OpenOptions::new()
+    .truncate(true)
+    .open(&dest_path)
+    .await
+  {
+    Ok(_) => {}
+    Err(_) => {}
+  }
+  let mut dest_file = match tokio::fs::OpenOptions::new()
+    .create(true)
+    .read(true)
+    .write(true)
+    .append(true)
+    .open(&dest_path)
+    .await
+  {
+    Ok(f) => f,
+    Err(e) => {
+      log::error!("Error opening dest file: {}", e);
+      return HttpResponse::InternalServerError().json(Errors::internal_error());
+    }
+  };
+
+  let mut hasher = Sha256::new();
+  let mut size = 0;
   for idx in parts {
     let upload_part_path = upload_parts_path.join(idx.to_string());
-    log::info!("Appending {:?} to {:?}", upload_part_path, dest_path);
+    let upload_part_file = match tokio::fs::File::open(&upload_part_path).await {
+      Ok(f) => f,
+      Err(e) => {
+        log::error!("Error opening upload part file: {}", e);
+        return HttpResponse::InternalServerError().json(Errors::internal_error());
+      }
+    };
+    match copy_file_and_hash(&mut hasher, upload_part_file, &mut dest_file).await {
+      Ok(s) => {
+        size += s;
+      }
+      Err(e) => {
+        log::error!("Error copying/hashing file part: {}", e);
+        return HttpResponse::InternalServerError().json(Errors::internal_error());
+      }
+    }
+  }
+  let hash = hex::encode(hasher.finalize());
+
+  match tokio::fs::remove_dir_all(&upload_parts_path).await {
+    Ok(_) => {}
+    Err(e) => {
+      log::error!("Error removing upload folder: {}", e);
+      return HttpResponse::InternalServerError().json(Errors::internal_error());
+    }
   }
 
-  HttpResponse::NoContent().finish()
+  let file = match upsert_file(pool.as_ref(), &token_data.claims.key, &hash, size as i32).await {
+    Ok(f) => f,
+    Err(e) => {
+      println!("Error creating file: {}", e);
+      return HttpResponse::InternalServerError().json(Errors::internal_error());
+    }
+  };
+
+  let file_response: File = file.into();
+  HttpResponse::Ok().json(file_response)
 }
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
