@@ -1,4 +1,4 @@
-use std::{fs::File, io, path::Path};
+use std::{io, path::Path};
 
 use anyhow::Result;
 use sha2::{Digest, Sha256};

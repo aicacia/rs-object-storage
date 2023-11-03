@@ -1,7 +1,7 @@
 use anyhow::Result;
-use futures::Future;
 use serde::de::DeserializeOwned;
 use sqlx::{postgres::PgListener, Pool, Postgres};
+use std::future::Future;
 
 pub async fn create_pool() -> Result<Pool<Postgres>> {
   let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL env variable is required");

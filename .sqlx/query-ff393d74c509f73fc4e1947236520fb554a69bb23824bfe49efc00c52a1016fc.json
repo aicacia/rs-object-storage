@@ -1,0 +1,54 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select 0 as \"id!\", f.key as \"key!\", sum(f.size)::integer as \"size!\", '' as \"hash!\", max(f.updated_at) as \"updated_at!\", min(f.created_at) as \"created_at!\" from (\n      select\n        concat($1, split_part(f.key, '/', 1)) as key,\n        f.size,\n        f.updated_at,\n        f.created_at\n      from (\n        select\n          substring(f.key, length($1) + 1) as key,\n          f.size as size,\n          f.updated_at as updated_at,\n          f.created_at as created_at\n        from\n          file f\n        where f.key ~ $2\n      ) f\n    ) f\n    group by f.key\n    union\n    select\n      f.id,\n      f.key,\n      f.size,\n      f.hash,\n      f.updated_at,\n      f.created_at\n    from\n      file f\n    where f.key ~ $3;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "key!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "size!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "hash!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "updated_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "ff393d74c509f73fc4e1947236520fb554a69bb23824bfe49efc00c52a1016fc"
+}

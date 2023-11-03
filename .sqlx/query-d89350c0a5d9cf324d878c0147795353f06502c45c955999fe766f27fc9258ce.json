@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select\n      f.id,\n      f.key,\n      f.size,\n      f.hash,\n      f.updated_at,\n      f.created_at\n    from\n      file f\n    where f.id = $1;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "size",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "hash",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "d89350c0a5d9cf324d878c0147795353f06502c45c955999fe766f27fc9258ce"
+}
