@@ -1,0 +1,54 @@
+replicas:
+  min: 1
+  max: 16
+  resource:
+    cpu:
+      utilization: 80
+    memory:
+      utilization: 90
+  scaleDown:
+    stabilizationWindowSeconds: 30
+  scaleUp:
+    stabilizationWindowSeconds: 15
+
+image:
+  repository: aicacia/storage-api
+  tag: latest
+  pullPolicy: Always
+  hash: sha256:41dc5087ec321069388b13f6f84535367df94b8691fe63fd043ba8832afbeb8b
+
+env:
+  DATABASE_URL: "sqlite:/data/storage-prod.db"
+
+config:
+  server:
+    url: https://api.storage.aicacia.com
+
+persistence:
+  storageClassName: linode-block-storage-retain
+  resources:
+    requests:
+      storage: 10Gi
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    kubernetes.io/tls-acme: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts:
+    - host: api.storage.aicacia.com
+      paths:
+        - /
+  tls:
+    - secretName: api-storage-aicacia-com-tls
+      hosts:
+        - api.storage.aicacia.com
+
+resources:
+  requests:
+    cpu: 15m
+    memory: 184M
+  limits:
+    cpu: 250m
+    memory: 512M

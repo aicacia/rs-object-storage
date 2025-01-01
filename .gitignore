@@ -1,0 +1,11 @@
+/.vscode
+/files
+/target
+/.cargo/config.toml
+/.env
+/!.env.example
+/config.json
+/!config.json.example
+/storage-dev.*
+/storage-admin-service-account.json
+/values.yaml

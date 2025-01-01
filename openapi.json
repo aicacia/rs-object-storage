@@ -1,0 +1,604 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "storage",
+    "description": "Aicacia Storage API provides blob services for applications.",
+    "contact": { "name": "nathanfaucett@gmail.com" },
+    "license": {
+      "name": "MIT OR Apache-2.0",
+      "identifier": "https://spdx.org/licenses/MIT.html"
+    },
+    "version": "0.1.0"
+  },
+  "servers": [{ "url": "http://localhost:3000" }],
+  "paths": {
+    "/files": {
+      "get": {
+        "tags": ["file"],
+        "operationId": "get_files",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": ["integer", "null"], "minimum": 0 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": ["integer", "null"], "minimum": 0 }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": { "type": ["string", "null"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Pagination_File" }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      },
+      "post": {
+        "tags": ["file"],
+        "operationId": "create_file",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateFileRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/File" }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/files/by-path": {
+      "get": {
+        "tags": ["file"],
+        "operationId": "get_file_by_path",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/File" }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/files/{file_id}": {
+      "get": {
+        "tags": ["file"],
+        "operationId": "get_file_by_id",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/File" }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      },
+      "delete": {
+        "tags": ["file"],
+        "operationId": "delete_file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "" },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/files/{file_id}/append": {
+      "put": {
+        "tags": ["file"],
+        "operationId": "append_file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/UploadPartRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "type": "integer", "minimum": 0 }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/files/{file_id}/move": {
+      "put": {
+        "tags": ["file"],
+        "operationId": "move_file",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MoveFileRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/File" }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/files/{file_id}/read": {
+      "get": {
+        "tags": ["file"],
+        "operationId": "read_file_by_id",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/octet-stream": {} }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["util"],
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Health check response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          },
+          "500": {
+            "description": "Health check response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "tags": ["openapi"],
+        "operationId": "get_openapi",
+        "responses": { "200": { "description": "OpenApi documenation" } }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": ["util"],
+        "operationId": "version",
+        "responses": {
+          "200": {
+            "description": "Version response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Version" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateFileRequest": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string" },
+          "type": { "type": ["string", "null"] }
+        }
+      },
+      "ErrorMessage": {
+        "type": "object",
+        "required": ["code", "parameters"],
+        "properties": {
+          "code": { "type": "string" },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": {},
+            "propertyNames": { "type": "string" }
+          }
+        }
+      },
+      "ErrorMessages": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/ErrorMessage" }
+      },
+      "Errors": {
+        "type": "object",
+        "required": ["status_code", "messages"],
+        "properties": {
+          "messages": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ErrorMessages"
+            },
+            "propertyNames": { "type": "string" }
+          },
+          "status_code": { "type": "integer", "format": "int32", "minimum": 0 }
+        }
+      },
+      "File": {
+        "type": "object",
+        "required": ["id", "path", "size", "updated_at", "created_at"],
+        "properties": {
+          "created_at": { "type": "string", "format": "date-time" },
+          "id": { "type": "integer", "format": "int64" },
+          "path": { "type": "string" },
+          "size": { "type": "integer", "format": "int64", "minimum": 0 },
+          "type": { "type": ["string", "null"] },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": ["db"],
+        "properties": { "db": { "type": "boolean" } }
+      },
+      "MoveFileRequest": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string" },
+          "type": { "type": ["string", "null"] }
+        }
+      },
+      "Pagination_File": {
+        "type": "object",
+        "required": ["has_more", "items"],
+        "properties": {
+          "has_more": { "type": "boolean" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "path", "size", "updated_at", "created_at"],
+              "properties": {
+                "created_at": { "type": "string", "format": "date-time" },
+                "id": { "type": "integer", "format": "int64" },
+                "path": { "type": "string" },
+                "size": { "type": "integer", "format": "int64", "minimum": 0 },
+                "type": { "type": ["string", "null"] },
+                "updated_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        }
+      },
+      "UploadPartRequest": {
+        "type": "object",
+        "required": ["part"],
+        "properties": {
+          "part": {
+            "type": "string",
+            "format": "binary",
+            "contentMediaType": "application/octet-stream"
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "required": ["version", "build"],
+        "properties": {
+          "build": { "type": "string", "format": "date-time" },
+          "version": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Authorization": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    { "name": "file", "description": "Files" },
+    { "name": "openapi", "description": "OpenApi endpoints" },
+    { "name": "util", "description": "Utility endpoints" }
+  ]
+}

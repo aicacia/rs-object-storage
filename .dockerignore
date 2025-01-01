@@ -1,0 +1,13 @@
+/.cargo
+/.github
+/.vscode
+/helm
+/target
+/.cargo
+/.env*
+/config.json
+/!config.json.example
+/storage-dev.*
+/storage-admin-service-account.json
+/docker-compose.yaml
+/values.yaml

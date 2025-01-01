@@ -1,0 +1,84 @@
+[package]
+authors = ["nathanfaucett@gmail.com"]
+default-run = "storage"
+description = "Aicacia Storage API provides blob services for applications."
+edition = "2021"
+license = "MIT OR Apache-2.0"
+name = "storage"
+repository = "https://github.com/aicacia/rs-storage"
+rust-version = "1.82"
+version = "0.1.0"
+
+[lib]
+name = "storage"
+
+[[bin]]
+name = "storage"
+
+[dependencies]
+dotenv = "0.15"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+axum = { version = "0.8.0-rc.1", default-features = false, features = [
+  "tokio",
+  "http1",
+  "json",
+  "query",
+  "multipart",
+  "macros",
+] }
+utoipa = { version = "5.3", default-features = false, features = [
+  "axum_extras",
+  "chrono",
+  "uuid",
+  "macros",
+] }
+# TODO: use when supports 8.0
+# utoipa-axum = { version = "0.2", default-features = false }
+clap = { version = "4.5", default-features = false, features = [
+  "std",
+  "derive",
+  "help",
+] }
+config = "0.15"
+tokio = { version = "1.42", default-features = false, features = [
+  "rt",
+  "fs",
+  "rt-multi-thread",
+  "macros",
+  "signal",
+] }
+tokio-util = { version = "0.7", default-features = false, features = ["io"] }
+futures-util = { version = "*", default-features = false }
+validator = { version = "0.19", features = ["derive"] }
+log = "0.4"
+build-time = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+sqlx = { version = "0.8", default-features = false, features = [
+  "uuid",
+  "chrono",
+  "time",
+  "macros",
+  "migrate",
+  "runtime-tokio-rustls",
+  "all-databases",
+] }
+uuid = { version = "1.11", features = ["serde", "v4"] }
+
+[dev-dependencies]
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "z"
+panic = "abort"
+strip = true
