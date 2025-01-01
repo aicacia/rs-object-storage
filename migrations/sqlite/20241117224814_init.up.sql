@@ -1,8 +1,8 @@
 CREATE TABLE "files" (
-  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"path" TEXT NOT NULL,
 	"type" TEXT,
-  "size" INTEGER NOT NULL,
+	"size" INTEGER NOT NULL,
 	"updated_at" INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
 	"created_at" INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 ) STRICT;
