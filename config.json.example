@@ -1,3 +1,6 @@
 {
+  "auth": {
+    "tenent_id": "98269e08-9e18-4132-b913-d91563bc5e8a"
+  },
   "files_dir": "./files"
 }

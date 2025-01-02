@@ -7,5 +7,5 @@
 /config.json
 /!config.json.example
 /storage-dev.*
-/storage-admin-service-account.json
+/storage-service-account.json
 /values.yaml

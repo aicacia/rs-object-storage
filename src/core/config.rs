@@ -40,9 +40,16 @@ pub struct DatabaseConfig {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct AuthConfig {
+  pub uri: String,
+  pub tenent_id: uuid::Uuid,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Config {
   pub server: ServerConfig,
   pub database: DatabaseConfig,
+  pub auth: AuthConfig,
   pub files_dir: String,
   pub log_level: String,
 }
@@ -65,6 +72,8 @@ impl Config {
       .set_default("database.acquire_timeout", 3)?
       .set_default("database.idle_timeout", 5)?
       .set_default("database.max_lifetime", 300)?
+      // Auth
+      .set_default("auth.uri", "https://api.auth.aicacia.com".to_owned())?
       // Defaults
       .set_default("files_dir", "./files")?
       .set_default("log_level", "debug")?

@@ -5,7 +5,7 @@ use crate::{
     config::get_config,
     error::{Errors, INTERNAL_ERROR, INVALID_ERROR, NOT_FOUND_ERROR, REQUEST_BODY},
   },
-  middleware::json::Json,
+  middleware::{authorization::Authorization, json::Json},
   model::{
     file::{CreateFileRequest, File, FileQuery, FilesQuery, MoveFileRequest, UploadPartRequest},
     util::{OffsetAndLimit, Pagination},
@@ -64,6 +64,7 @@ pub struct ApiDoc;
 )]
 pub async fn get_files(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Query(offset_and_limit_query): Query<OffsetAndLimit>,
   Query(files_query): Query<FilesQuery>,
 ) -> impl IntoResponse {
@@ -110,6 +111,7 @@ pub async fn get_files(
 )]
 pub async fn get_file_by_path(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Query(file_query): Query<FileQuery>,
 ) -> impl IntoResponse {
   let file_row = match repository::file::get_file_by_path(&state.pool, &file_query.path).await {
@@ -147,6 +149,7 @@ pub async fn get_file_by_path(
 )]
 pub async fn get_file_by_id(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Path(file_id): Path<i64>,
 ) -> impl IntoResponse {
   let file_row = match repository::file::get_file_by_id(&state.pool, file_id).await {
@@ -184,6 +187,7 @@ pub async fn get_file_by_id(
 )]
 pub async fn read_file_by_id(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Path(file_id): Path<i64>,
 ) -> impl IntoResponse {
   let file_row = match repository::file::get_file_by_id(&state.pool, file_id).await {
@@ -250,6 +254,7 @@ pub async fn read_file_by_id(
 )]
 pub async fn create_file(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Json(body): Json<CreateFileRequest>,
 ) -> impl IntoResponse {
   let file_row = match service::file::create_file(&state.pool, body.path, body.kind).await {
@@ -283,6 +288,7 @@ pub async fn create_file(
 )]
 pub async fn append_file(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Path(file_id): Path<i64>,
   mut multipart: Multipart,
 ) -> impl IntoResponse {
@@ -375,6 +381,7 @@ pub async fn append_file(
 )]
 pub async fn move_file(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Path(file_id): Path<i64>,
   Json(body): Json<MoveFileRequest>,
 ) -> impl IntoResponse {
@@ -414,6 +421,7 @@ pub async fn move_file(
 )]
 pub async fn delete_file(
   State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
   Path(file_id): Path<i64>,
 ) -> impl IntoResponse {
   match service::file::delete_file(&state.pool, file_id).await {

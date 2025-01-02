@@ -41,6 +41,7 @@ clap = { version = "4.5", default-features = false, features = [
   "help",
 ] }
 config = "0.15"
+http = "1.2"
 tokio = { version = "1.42", default-features = false, features = [
   "rt",
   "fs",
@@ -50,6 +51,10 @@ tokio = { version = "1.42", default-features = false, features = [
 ] }
 tokio-util = { version = "0.7", default-features = false, features = ["io"] }
 futures-util = { version = "*", default-features = false }
+reqwest = { version = "0.12", default-features = false, features = [
+  "rustls-tls",
+  "json",
+] }
 validator = { version = "0.19", features = ["derive"] }
 log = "0.4"
 build-time = "0.1"

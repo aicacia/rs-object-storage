@@ -10,7 +10,6 @@ Aicacia Storage API provides blob services for applications.
 ## Table of Contents
 
 - [Development Setup](#development-setup)
-- [Getting Started](#getting-started)
 - [Build Instructions](#build-instructions)
 - [Database Migrations](#database-migrations)
 - [Docker and Helm](#docker-and-helm)
@@ -69,32 +68,6 @@ To set up the development environment:
 6. **View API Documentation:**
    - Access the OpenAPI Docs:  
      [OpenAPI Documentation](https://petstore.swagger.io/?url=http://localhost:3000/openapi.json)
-
----
-
-## Getting Started
-
-On startup, if no service accounts exist, the service creates a new one and saves it to the current working directory as `storage-admin-service-account.json`.
-
-### Default Tenant ID
-
-The following default Tenant ID is provided for convenience:
-
-```plaintext
-Tenant-ID: 6fcf0235-cb11-4160-9df8-b9114f8dcdae
-```
-
-### Creating a Service Account Token
-
-Use the following JSON structure to create a service account token:
-
-```json
-{
-  "grant_type": "service-account",
-  "client_id": "...",
-  "secret": "..."
-}
-```
 
 ---
 
