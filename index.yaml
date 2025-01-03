@@ -3,12 +3,12 @@ entries:
   storage-api:
   - apiVersion: v2
     appVersion: latest
-    created: "2025-01-02T10:28:05.397361629Z"
+    created: "2025-01-03T11:06:52.186007389Z"
     description: Aicacia Storage API provides blob services for applications.
-    digest: 7a49cc2b611176a0c85cef4f9c9f0735407d3eb3c924c2f200d009d1f8460b13
+    digest: c6fdbab19c627aa21d13d109fa58f2bc7a2610988cddf536c35584c177e290bc
     name: storage-api
     type: application
     urls:
     - storage-api-0.1.0.tgz
     version: 0.1.0
-generated: "2025-01-02T10:28:05.396877362Z"
+generated: "2025-01-03T11:06:52.185558195Z"
