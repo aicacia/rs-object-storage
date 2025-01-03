@@ -80,9 +80,9 @@ webrtc-http = { git = "https://github.com/aicacia/rs-webrtc-http.git", rev = "7a
 ] }
 peer = { git = "https://github.com/aicacia/rs-peer.git" }
 webrtc = "*"
-async-tungstenite = { version = "0.28", features = [
-  "handshake",
-  "tokio-native-tls",
+async-tungstenite = { version = "0.28", default-features = false, features = [
+  "tokio-runtime",
+  "tokio-rustls-native-certs",
 ] }
 urlencoding = "2.1"
 dashmap = "6.1"
