@@ -19,7 +19,7 @@ name = "storage"
 dotenv = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-axum = { version = "0.8.0-rc.1", default-features = false, features = [
+axum = { version = "0.8", default-features = false, features = [
   "tokio",
   "http1",
   "json",
@@ -51,6 +51,7 @@ tokio = { version = "1.42", default-features = false, features = [
 ] }
 tokio-util = { version = "0.7", default-features = false, features = ["io"] }
 futures-util = { version = "*", default-features = false }
+lazy_static = "1.5"
 reqwest = { version = "0.12", default-features = false, features = [
   "rustls-tls",
   "json",
@@ -73,6 +74,18 @@ sqlx = { version = "0.8", default-features = false, features = [
 ] }
 uuid = { version = "1.11", features = ["serde", "v4"] }
 atomicoption = { git = "https://github.com/aicacia/rs-atomic-option.git", rev = "f5cc802" }
+# peer server deps
+webrtc-http = { git = "https://github.com/aicacia/rs-webrtc-http.git", rev = "7a1b0ec", features = [
+  "axum",
+] }
+peer = { git = "https://github.com/aicacia/rs-peer.git" }
+webrtc = "*"
+async-tungstenite = { version = "0.28", features = [
+  "handshake",
+  "tokio-native-tls",
+] }
+urlencoding = "2.1"
+dashmap = "6.1"
 
 [dev-dependencies]
 

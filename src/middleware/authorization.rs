@@ -58,7 +58,7 @@ async fn auth_is_jwt_valid(
   reqwest::Client::new()
     .get(format!("{}/jwt", config.auth.uri))
     .bearer_auth(token)
-    .header("tenent-id", config.auth.tenent_id.to_string())
+    .header("tenent-id", config.auth.tenent_client_id.to_string())
     .send()
     .await?
     .json::<serde_json::Map<String, serde_json::Value>>()

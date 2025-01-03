@@ -1,6 +1,17 @@
 {
+  "p2p": {
+    "tenent_id": 1,
+    "uri": "https://api.p2p.aicacia.com",
+    "id": "33159a95-e2d6-4376-afaf-ab101f05e1f6",
+    "password": "12aa4663-7b96-4b21-802c-402e24bb7672"
+  },
   "auth": {
-    "tenent_id": "98269e08-9e18-4132-b913-d91563bc5e8a"
+    "tenent_id": 1,
+    "tenent_client_id": "98269e08-9e18-4132-b913-d91563bc5e8a",
+    "service_account": {
+      "client_id": "b0c72bcf-15a0-4d3b-ad2d-5a97a131f4e9",
+      "client_secret": "2450ea91-4123-44f2-8943-b4dfbc2a2fa3"
+    }
   },
   "files_dir": "./files"
 }

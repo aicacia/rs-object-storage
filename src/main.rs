@@ -10,6 +10,7 @@ use storage::{
     error::Errors,
   },
   router::{create_router, RouterState},
+  service::peer::serve_peer,
 };
 use tokio_util::sync::CancellationToken;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -47,7 +48,8 @@ async fn main() -> Result<(), Errors> {
   let cancellation_token = CancellationToken::new();
 
   let router = create_router(RouterState { pool: pool.clone() });
-  let serve_handle = tokio::spawn(serve(router, cancellation_token.clone()));
+  let serve_handle = tokio::spawn(serve(router.clone(), cancellation_token.clone()));
+  let serve_peer_handle = tokio::spawn(serve_peer(router, cancellation_token.clone()));
 
   shutdown_signal(cancellation_token).await;
 
@@ -55,6 +57,12 @@ async fn main() -> Result<(), Errors> {
     Ok(_) => {}
     Err(e) => {
       log::error!("Error serving: {}", e);
+    }
+  }
+  match serve_peer_handle.await {
+    Ok(_) => {}
+    Err(e) => {
+      log::error!("Error serving peer: {}", e);
     }
   }
   cleanup_pool(pool).await;
