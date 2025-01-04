@@ -42,7 +42,7 @@ pub struct DatabaseConfig {
 #[derive(Debug, Deserialize)]
 pub struct P2PConfig {
   pub enabled: bool,
-  pub tenent_id: i64,
+  pub tenant_id: i64,
   pub ws_uri: String,
   pub api_uri: String,
   pub id: String,
@@ -58,8 +58,8 @@ pub struct AuthServiceAccountConfig {
 #[derive(Debug, Deserialize)]
 pub struct AuthConfig {
   pub uri: String,
-  pub tenent_id: i64,
-  pub tenent_client_id: uuid::Uuid,
+  pub tenant_id: i64,
+  pub tenant_client_id: uuid::Uuid,
   pub service_account: AuthServiceAccountConfig,
 }
 

@@ -104,7 +104,7 @@ pub async fn get_file_by_id(pool: &sqlx::AnyPool, id: i64) -> sqlx::Result<Optio
     .await
 }
 
-pub(crate) async fn create_file(
+pub async fn create_file(
   transaction: &mut sqlx::Transaction<'_, sqlx::Any>,
   path: String,
   kind: Option<String>,
@@ -118,7 +118,7 @@ pub(crate) async fn create_file(
     .await
 }
 
-pub(crate) async fn update_file_size(
+pub async fn update_file_size(
   pool: &sqlx::AnyPool,
   id: i64,
   size: i64,
@@ -130,7 +130,7 @@ pub(crate) async fn update_file_size(
     .await
 }
 
-pub(crate) async fn update_file_path(
+pub async fn update_file_path(
   pool: &sqlx::AnyPool,
   id: i64,
   path: String,
@@ -144,12 +144,22 @@ pub(crate) async fn update_file_path(
     .await
 }
 
-pub(crate) async fn delete_file(
+pub async fn delete_file(
   transaction: &mut sqlx::Transaction<'_, sqlx::Any>,
   id: i64,
 ) -> sqlx::Result<Option<FileRow>> {
   sqlx::query_as("DELETE FROM files WHERE id = $1 RETURNING *")
     .bind(id)
+    .fetch_optional(&mut **transaction)
+    .await
+}
+
+pub async fn delete_file_by_path(
+  transaction: &mut sqlx::Transaction<'_, sqlx::Any>,
+  path: &str,
+) -> sqlx::Result<Option<FileRow>> {
+  sqlx::query_as("DELETE FROM files WHERE path = $1 RETURNING *")
+    .bind(path)
     .fetch_optional(&mut **transaction)
     .await
 }

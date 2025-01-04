@@ -34,6 +34,7 @@ use super::RouterState;
     get_file_by_path,
     get_file_by_id,
     read_file_by_id,
+    read_file_by_path,
     create_file,
     append_file,
     move_file,
@@ -176,7 +177,7 @@ pub async fn get_file_by_id(
   path = "files/{file_id}/read",
   tags = ["file"],
   responses(
-    (status = 200, content_type = "application/octet-stream"),
+    (status = 200, content_type = "*/*"),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 404, content_type = "application/json", body = Errors),
     (status = 500, content_type = "application/json", body = Errors),
@@ -196,6 +197,75 @@ pub async fn read_file_by_id(
       log::error!("File not found: {}", file_id);
       return Errors::not_found()
         .with_error("file_id", NOT_FOUND_ERROR)
+        .into_response();
+    }
+    Err(err) => {
+      log::error!("Error getting files from database: {}", err);
+      return Errors::internal_error()
+        .with_application_error(INTERNAL_ERROR)
+        .into_response();
+    }
+  };
+
+  let config = get_config();
+  let files_path = std::path::Path::new(&config.files_dir);
+  let file_path = files_path.join(file_row.id.to_string());
+  let file = match fs::OpenOptions::new()
+    .create(false)
+    .read(true)
+    .open(file_path)
+    .await
+  {
+    Ok(file) => file,
+    Err(err) => {
+      log::error!("Error opening file: {}", err);
+      return Errors::internal_error()
+        .with_application_error(INTERNAL_ERROR)
+        .into_response();
+    }
+  };
+  let content_type = file_row
+    .kind
+    .unwrap_or_else(|| "application/octet-stream".to_owned());
+  let content_disposition = format!("attachment; filename={:?}", file_row.path);
+  (
+    [
+      (header::CONTENT_TYPE, content_type),
+      (header::CONTENT_DISPOSITION, content_disposition),
+    ],
+    Body::from_stream(ReaderStream::new(file)),
+  )
+    .into_response()
+}
+
+#[utoipa::path(
+  get,
+  path = "files/by-path/read",
+  tags = ["file"],
+  params(
+    FileQuery,
+  ),
+  responses(
+    (status = 200, content_type = "*/*"),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
+  ),
+  security(
+    ("Authorization" = [])
+  )
+)]
+pub async fn read_file_by_path(
+  State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
+  Query(query): Query<FileQuery>,
+) -> impl IntoResponse {
+  let file_row = match repository::file::get_file_by_path(&state.pool, &query.path).await {
+    Ok(Some(file)) => file,
+    Ok(None) => {
+      log::error!("File not found: {}", query.path);
+      return Errors::not_found()
+        .with_error("path", NOT_FOUND_ERROR)
         .into_response();
     }
     Err(err) => {
@@ -448,6 +518,7 @@ pub fn create_router(state: RouterState) -> Router {
     .route("/files/by-path", get(get_file_by_path))
     .route("/files/{file_id}", get(get_file_by_id))
     .route("/files/{file_id}/read", get(read_file_by_id))
+    .route("/files/by-path/read", get(read_file_by_path))
     .route("/files", post(create_file))
     .route("/files/{file_id}/append", put(append_file))
     .route("/files/{file_id}/move", put(move_file))

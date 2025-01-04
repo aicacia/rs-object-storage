@@ -9,7 +9,7 @@ lazy_static! {
 
 #[derive(Serialize)]
 pub struct JWTRequest {
-  pub tenent_id: i64,
+  pub tenant_id: i64,
   pub claims: serde_json::Map<String, serde_json::Value>,
 }
 
@@ -18,7 +18,7 @@ pub async fn create_jwt(
 ) -> Result<String, reqwest::Error> {
   let config = get_config();
   let body = JWTRequest {
-    tenent_id: config.p2p.tenent_id,
+    tenant_id: config.p2p.tenant_id,
     claims,
   };
   let service_account_token = get_service_account_token().await?;
@@ -79,14 +79,41 @@ async fn create_service_account_token() -> Result<Token, reqwest::Error> {
     client_id: config.auth.service_account.client_id,
     client_secret: config.auth.service_account.client_secret,
   };
-  let token = reqwest::Client::new()
+  reqwest::Client::new()
     .post(format!("{}/token", config.auth.uri))
-    .header("Tenant-ID", config.auth.tenent_client_id.to_string())
+    .header("Tenant-ID", config.auth.tenant_client_id.to_string())
     .json(&body)
     .send()
     .await?
     .json::<Token>()
-    .await?;
+    .await
+}
 
-  Ok(token)
+#[derive(Deserialize)]
+pub struct Claims {
+  #[serde(rename = "type")]
+  pub kind: String,
+  pub exp: i64,
+  pub iat: i64,
+  pub nbf: i64,
+  pub iss: String,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub aud: Option<String>,
+  #[serde(rename = "sub_type")]
+  pub sub_kind: String,
+  pub sub: i64,
+  pub app: i64,
+  pub scopes: Vec<String>,
+}
+
+pub async fn auth_is_jwt_valid(token: &str) -> Result<Claims, reqwest::Error> {
+  let config = get_config();
+  reqwest::Client::new()
+    .get(format!("{}/jwt", config.auth.uri))
+    .bearer_auth(token)
+    .header("Tenant-ID", config.auth.tenant_client_id.to_string())
+    .send()
+    .await?
+    .json::<Claims>()
+    .await
 }
