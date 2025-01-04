@@ -5,7 +5,7 @@ use dashmap::DashMap;
 use futures_util::StreamExt;
 use peer::{peer::SignalMessage, Peer, PeerOptions};
 use serde::{Deserialize, Serialize};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 use tokio_util::sync::CancellationToken;
 use webrtc::{
   api::{
@@ -195,6 +195,10 @@ pub struct AuthenticateBody {
   password: String,
 }
 
+lazy_static! {
+  static ref AUTH_P2P_TOKEN: RwLock<Option<(String, i64)>> = RwLock::new(None);
+}
+
 async fn create_p2p_ws_server_token() -> Result<String, reqwest::Error> {
   let config = get_config();
   let body = AuthenticateBody {
@@ -213,19 +217,33 @@ async fn create_p2p_ws_server_token() -> Result<String, reqwest::Error> {
   Ok(token)
 }
 
-fn create_p2p_claims() -> serde_json::Map<String, serde_json::Value> {
+fn create_p2p_claims() -> (serde_json::Map<String, serde_json::Value>, i64) {
   let config = get_config();
   let now = chrono::Utc::now().timestamp();
-  let expires = 60 * 60 * 24;
+  let expires_seconds = 5 * 60;
+  let expires_at = now + expires_seconds;
   let mut claims = serde_json::Map::new();
   claims.insert("iss".to_owned(), serde_json::json!("P2P"));
   claims.insert("iat".to_owned(), serde_json::json!(now));
-  claims.insert("exp".to_owned(), serde_json::json!(now + expires));
+  claims.insert("exp".to_owned(), serde_json::json!(expires_at));
   claims.insert("aud".to_owned(), serde_json::json!("P2P"));
   claims.insert("sub".to_owned(), serde_json::json!(config.p2p.id));
-  claims
+  (claims, expires_at)
 }
 
 async fn create_p2p_token() -> Result<String, reqwest::Error> {
-  auth::create_jwt(create_p2p_claims()).await
+  let now = chrono::Utc::now().timestamp();
+  if let Some((token, expires_at)) = AUTH_P2P_TOKEN.read().await.as_ref() {
+    if now < *expires_at {
+      return Ok(token.clone());
+    }
+  }
+  let mut auth_p2p_token = AUTH_P2P_TOKEN.write().await;
+
+  let (claims, expires_at) = create_p2p_claims();
+  let token = auth::create_jwt(claims).await?;
+
+  auth_p2p_token.replace((token.clone(), expires_at));
+
+  Ok(token)
 }
