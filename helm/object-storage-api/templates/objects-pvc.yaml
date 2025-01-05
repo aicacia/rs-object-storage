@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "object-storage-api.fullname" . }}-objects-pvc
+  labels:
+    {{- include "object-storage-api.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    {{- toYaml .Values.persistence.objects.resources | nindent 6 }}
+  storageClassName: {{ .Values.persistence.objects.storageClassName }}

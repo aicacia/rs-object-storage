@@ -33,6 +33,8 @@ spec:
             - name: config-json
               mountPath: /app/config.json
               subPath: config.json
+            - name: objects-pvc
+              mountPath: {{- .Values.config.objects_dir }}
             {{- if eq (include "object-storage-api.is-sqlite" .) "true" }}
             - name: sqlite-pvc
               mountPath: {{ dir (include "object-storage-api.sqlite-path" .) }}
@@ -56,10 +58,13 @@ spec:
         - name: config-json
           configMap:
             name: {{ include "object-storage-api.fullname" . }}-config
+        - name: objects-pvc
+          persistentVolumeClaim:
+            claimName: {{ include "object-storage-api.fullname" . }}-objects-pvc
         {{- if eq (include "object-storage-api.is-sqlite" .) "true" }}
         - name: sqlite-pvc
           persistentVolumeClaim:
-            claimName: {{ include "object-storage-api.fullname" . }}-pvc
+            claimName: {{ include "object-storage-api.fullname" . }}-sqlite-pvc
         {{- end -}}
       {{- with .Values.nodeSelector }}
       nodeSelector:

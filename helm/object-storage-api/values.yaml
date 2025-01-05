@@ -21,14 +21,21 @@ env:
   DATABASE_URL: "sqlite:/data/object-storage-prod.db"
 
 config:
+  objects_dir: "./objects"
   server:
     url: https://api.object-storage.aicacia.com
 
 persistence:
-  storageClassName: linode-block-object-storage-retain
-  resources:
-    requests:
-      object-storage: 10Gi
+  sqlite:
+    storageClassName: linode-block-object-storage-retain
+    resources:
+      requests:
+        object-storage: 10Gi
+  objects:
+    storageClassName: linode-block-object-storage-retain
+    resources:
+      requests:
+        object-storage: 10Gi
 
 ingress:
   enabled: true
