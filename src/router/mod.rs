@@ -1,4 +1,4 @@
-pub mod file;
+pub mod object;
 pub mod openapi;
 pub mod util;
 
@@ -21,7 +21,7 @@ unsafe impl Sync for RouterState {}
 #[openapi(
   info(license(name = "MIT OR Apache-2.0", identifier = "https://spdx.org/licenses/MIT.html")),
   nest(
-    (path = "/", api = file::ApiDoc),
+    (path = "/", api = object::ApiDoc),
     (path = "/", api = openapi::ApiDoc),
     (path = "/", api = util::ApiDoc),
   ),
@@ -39,7 +39,7 @@ pub fn create_router(state: RouterState) -> Router {
     .push(Server::new(config.server.url.clone()));
 
   Router::new()
-    .merge(file::create_router(state.clone()))
+    .merge(object::create_router(state.clone()))
     .merge(openapi::create_router(doc))
     .merge(util::create_router(state.clone()))
     .layer(CorsLayer::very_permissive())

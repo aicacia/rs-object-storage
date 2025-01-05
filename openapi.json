@@ -12,10 +12,34 @@
   },
   "servers": [{ "url": "http://localhost:3000" }],
   "paths": {
-    "/files": {
+    "/health": {
       "get": {
-        "tags": ["file"],
-        "operationId": "get_files",
+        "tags": ["util"],
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Health check response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          },
+          "500": {
+            "description": "Health check response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects": {
+      "get": {
+        "tags": ["object"],
+        "operationId": "get_objects",
         "parameters": [
           {
             "name": "offset",
@@ -40,9 +64,7 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Pagination_File" }
-              }
+              "application/json": { "schema": { "type": "object" } }
             }
           },
           "401": {
@@ -65,12 +87,12 @@
         "security": [{ "Authorization": [] }]
       },
       "post": {
-        "tags": ["file"],
-        "operationId": "create_file",
+        "tags": ["object"],
+        "operationId": "create_object",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateFileRequest" }
+              "schema": { "$ref": "#/components/schemas/CreateObjectRequest" }
             }
           },
           "required": true
@@ -79,9 +101,7 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/File" }
-              }
+              "application/json": { "schema": { "type": "object" } }
             }
           },
           "400": {
@@ -112,10 +132,10 @@
         "security": [{ "Authorization": [] }]
       }
     },
-    "/files/by-path": {
+    "/objects/by-path": {
       "get": {
-        "tags": ["file"],
-        "operationId": "get_file_by_path",
+        "tags": ["object"],
+        "operationId": "get_object_by_path",
         "parameters": [
           {
             "name": "path",
@@ -128,9 +148,7 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/File" }
-              }
+              "application/json": { "schema": { "type": "object" } }
             }
           },
           "401": {
@@ -161,10 +179,10 @@
         "security": [{ "Authorization": [] }]
       }
     },
-    "/files/by-path/read": {
+    "/objects/by-path/read": {
       "get": {
-        "tags": ["file"],
-        "operationId": "read_file_by_path",
+        "tags": ["object"],
+        "operationId": "read_object_by_path",
         "parameters": [
           {
             "name": "path",
@@ -203,13 +221,13 @@
         "security": [{ "Authorization": [] }]
       }
     },
-    "/files/{file_id}": {
+    "/objects/{object_id}": {
       "get": {
-        "tags": ["file"],
-        "operationId": "get_file_by_id",
+        "tags": ["object"],
+        "operationId": "get_object_by_id",
         "parameters": [
           {
-            "name": "file_id",
+            "name": "object_id",
             "in": "path",
             "required": true,
             "schema": { "type": "integer", "format": "int64" }
@@ -219,9 +237,7 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/File" }
-              }
+              "application/json": { "schema": { "type": "object" } }
             }
           },
           "401": {
@@ -252,11 +268,11 @@
         "security": [{ "Authorization": [] }]
       },
       "delete": {
-        "tags": ["file"],
-        "operationId": "delete_file",
+        "tags": ["object"],
+        "operationId": "delete_object",
         "parameters": [
           {
-            "name": "file_id",
+            "name": "object_id",
             "in": "path",
             "required": true,
             "schema": { "type": "integer", "format": "int64" }
@@ -300,13 +316,13 @@
         "security": [{ "Authorization": [] }]
       }
     },
-    "/files/{file_id}/append": {
+    "/objects/{object_id}/append": {
       "put": {
-        "tags": ["file"],
-        "operationId": "append_file",
+        "tags": ["object"],
+        "operationId": "append_object",
         "parameters": [
           {
-            "name": "file_id",
+            "name": "object_id",
             "in": "path",
             "required": true,
             "schema": { "type": "integer", "format": "int64" }
@@ -365,13 +381,13 @@
         "security": [{ "Authorization": [] }]
       }
     },
-    "/files/{file_id}/move": {
+    "/objects/{object_id}/move": {
       "put": {
-        "tags": ["file"],
-        "operationId": "move_file",
+        "tags": ["object"],
+        "operationId": "move_object",
         "parameters": [
           {
-            "name": "file_id",
+            "name": "object_id",
             "in": "path",
             "required": true,
             "schema": { "type": "integer", "format": "int64" }
@@ -380,7 +396,7 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/MoveFileRequest" }
+              "schema": { "$ref": "#/components/schemas/MoveObjectRequest" }
             }
           },
           "required": true
@@ -389,9 +405,7 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/File" }
-              }
+              "application/json": { "schema": { "type": "object" } }
             }
           },
           "400": {
@@ -430,13 +444,13 @@
         "security": [{ "Authorization": [] }]
       }
     },
-    "/files/{file_id}/read": {
+    "/objects/{object_id}/read": {
       "get": {
-        "tags": ["file"],
-        "operationId": "read_file_by_id",
+        "tags": ["object"],
+        "operationId": "read_object_by_id",
         "parameters": [
           {
-            "name": "file_id",
+            "name": "object_id",
             "in": "path",
             "required": true,
             "schema": { "type": "integer", "format": "int64" }
@@ -472,30 +486,6 @@
         "security": [{ "Authorization": [] }]
       }
     },
-    "/health": {
-      "get": {
-        "tags": ["util"],
-        "operationId": "health",
-        "responses": {
-          "200": {
-            "description": "Health check response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Health" }
-              }
-            }
-          },
-          "500": {
-            "description": "Health check response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Health" }
-              }
-            }
-          }
-        }
-      }
-    },
     "/openapi.json": {
       "get": {
         "tags": ["openapi"],
@@ -522,7 +512,7 @@
   },
   "components": {
     "schemas": {
-      "CreateFileRequest": {
+      "CreateObjectRequest": {
         "type": "object",
         "required": ["path"],
         "properties": {
@@ -560,51 +550,17 @@
           "status_code": { "type": "integer", "format": "int32", "minimum": 0 }
         }
       },
-      "File": {
-        "type": "object",
-        "required": ["id", "path", "size", "updated_at", "created_at"],
-        "properties": {
-          "created_at": { "type": "string", "format": "date-time" },
-          "id": { "type": "integer", "format": "int64" },
-          "path": { "type": "string" },
-          "size": { "type": "integer", "format": "int64", "minimum": 0 },
-          "type": { "type": ["string", "null"] },
-          "updated_at": { "type": "string", "format": "date-time" }
-        }
-      },
       "Health": {
         "type": "object",
         "required": ["db"],
         "properties": { "db": { "type": "boolean" } }
       },
-      "MoveFileRequest": {
+      "MoveObjectRequest": {
         "type": "object",
         "required": ["path"],
         "properties": {
           "path": { "type": "string" },
           "type": { "type": ["string", "null"] }
-        }
-      },
-      "Pagination_File": {
-        "type": "object",
-        "required": ["has_more", "items"],
-        "properties": {
-          "has_more": { "type": "boolean" },
-          "items": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["id", "path", "size", "updated_at", "created_at"],
-              "properties": {
-                "created_at": { "type": "string", "format": "date-time" },
-                "id": { "type": "integer", "format": "int64" },
-                "path": { "type": "string" },
-                "size": { "type": "integer", "format": "int64", "minimum": 0 },
-                "type": { "type": ["string", "null"] },
-                "updated_at": { "type": "string", "format": "date-time" }
-              }
-            }
-          }
         }
       },
       "UploadPartRequest": {
@@ -636,7 +592,7 @@
     }
   },
   "tags": [
-    { "name": "file", "description": "Files" },
+    { "name": "object", "description": "Objects" },
     { "name": "openapi", "description": "OpenApi endpoints" },
     { "name": "util", "description": "Utility endpoints" }
   ]

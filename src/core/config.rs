@@ -68,7 +68,7 @@ pub struct Config {
   pub database: DatabaseConfig,
   pub p2p: P2PConfig,
   pub auth: AuthConfig,
-  pub files_dir: String,
+  pub objects_dir: String,
   pub log_level: String,
 }
 
@@ -99,7 +99,7 @@ impl Config {
       // Auth
       .set_default("auth.uri", "https://api.auth.aicacia.com".to_owned())?
       // Defaults
-      .set_default("files_dir", "./files")?
+      .set_default("objects_dir", "./objects")?
       .set_default("log_level", "debug")?
       .add_source(config::File::with_name("./config.json"))
       .add_source(config::Environment::with_prefix("APP"))

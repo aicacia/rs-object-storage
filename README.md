@@ -30,7 +30,7 @@ To set up the development environment:
 
 2. **Configure Environment Variables:**
 
-   - Rename the example `.env` file:
+   - Rename the example `.env` object:
      ```bash
      cp .env.example .env
      ```

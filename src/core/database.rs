@@ -37,11 +37,11 @@ pub async fn init_pool() -> Result<sqlx::AnyPool, sqlx::Error> {
       }
     }
     if !path.exists() {
-      log::info!("Creating database file: {:?}", path);
+      log::info!("Creating database object: {:?}", path);
       match File::create(path) {
         Ok(_) => (),
         Err(e) => {
-          log::error!("Failed to create database file: {}", e);
+          log::error!("Failed to create database object: {}", e);
           return Err(sqlx::Error::Io(e));
         }
       }

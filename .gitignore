@@ -1,5 +1,5 @@
 /.vscode
-/files
+/objects
 /target
 /.cargo/config.toml
 /.env

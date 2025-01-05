@@ -13,5 +13,5 @@
       "client_secret": "2450ea91-4123-44f2-8943-b4dfbc2a2fa3"
     }
   },
-  "files_dir": "./files"
+  "objects_dir": "./objects"
 }

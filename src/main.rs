@@ -27,7 +27,7 @@ async fn main() -> Result<(), Errors> {
 
   let config = init_config().await?;
 
-  create_dir_all(&config.files_dir).await?;
+  create_dir_all(&config.objects_dir).await?;
 
   let level = tracing::Level::from_str(&config.log_level).unwrap_or(tracing::Level::DEBUG);
   tracing_subscriber::registry()

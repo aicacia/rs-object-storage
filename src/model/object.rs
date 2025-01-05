@@ -3,20 +3,20 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 
-use crate::repository::file::FileRow;
+use crate::repository::object::ObjectRow;
 
 #[derive(Deserialize, IntoParams)]
-pub struct FilesQuery {
+pub struct ObjectsQuery {
   pub path: Option<String>,
 }
 
 #[derive(Deserialize, IntoParams)]
-pub struct FileQuery {
+pub struct ObjectQuery {
   pub path: String,
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct CreateFileRequest {
+pub struct CreateObjectRequest {
   pub path: String,
   #[serde(rename = "type")]
   pub kind: Option<String>,
@@ -30,14 +30,14 @@ pub struct UploadPartRequest {
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct MoveFileRequest {
+pub struct MoveObjectRequest {
   pub path: String,
   #[serde(rename = "type")]
   pub kind: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct File {
+pub struct Object {
   pub id: i64,
   pub path: String,
   #[serde(rename = "type")]
@@ -47,8 +47,8 @@ pub struct File {
   pub created_at: DateTime<Utc>,
 }
 
-impl From<FileRow> for File {
-  fn from(row: FileRow) -> Self {
+impl From<ObjectRow> for Object {
+  fn from(row: ObjectRow) -> Self {
     Self {
       id: row.id,
       path: row.path,
