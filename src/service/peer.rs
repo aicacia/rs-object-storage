@@ -205,16 +205,14 @@ async fn create_p2p_ws_server_token() -> Result<String, reqwest::Error> {
     id: config.p2p.id.clone(),
     password: config.p2p.password.clone(),
   };
-  let token = reqwest::Client::new()
+  reqwest::Client::new()
     .post(format!("{}/server", config.p2p.api_uri))
     .bearer_auth(create_p2p_token().await?)
     .json(&body)
     .send()
     .await?
     .text()
-    .await?;
-
-  Ok(token)
+    .await
 }
 
 fn create_p2p_claims() -> (serde_json::Map<String, serde_json::Value>, i64) {

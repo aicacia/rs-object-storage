@@ -22,16 +22,14 @@ pub async fn create_jwt(
     claims,
   };
   let service_account_token = get_service_account_token().await?;
-  let jwt = reqwest::Client::new()
+  reqwest::Client::new()
     .post(format!("{}/jwt", config.auth.uri))
     .bearer_auth(service_account_token)
     .json(&body)
     .send()
     .await?
     .text()
-    .await?;
-
-  Ok(jwt)
+    .await
 }
 
 #[derive(Debug, Serialize)]
@@ -108,16 +106,12 @@ pub struct Claims {
 
 pub async fn auth_is_jwt_valid(token: &str) -> Result<Claims, reqwest::Error> {
   let config = get_config();
-  let text = reqwest::Client::new()
+  reqwest::Client::new()
     .get(format!("{}/jwt", config.auth.uri))
     .bearer_auth(token)
     .header("Tenant-ID", config.auth.tenant_client_id.to_string())
     .send()
     .await?
-    .text()
-    .await?;
-
-  log::info!("text: {text}");
-
-  Ok(serde_json::from_str(&text).unwrap())
+    .json::<Claims>()
+    .await
 }
