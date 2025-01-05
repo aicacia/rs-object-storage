@@ -32,7 +32,7 @@ LABEL org.opencontainers.image.source=https://github.com/aicacia/rs-object-stora
 
 WORKDIR /app
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/object-storage /usr/local/bin
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/object_storage /usr/local/bin
 
 ENV RUN_MODE=production
 
