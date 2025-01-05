@@ -40,7 +40,7 @@ async fn main() -> Result<(), Errors> {
       tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
         format!(
           "{}={level},tower_http={level},axum::rejection=trace",
-          env!("CARGO_PKG_NAME"),
+          env!("CARGO_PKG_NAME").replace("-", "_"),
           level = level.as_str().to_lowercase()
         )
         .into()
