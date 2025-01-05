@@ -18,14 +18,19 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
-struct Args {}
+struct Args {
+  #[arg(short, long, default_value = "./config.json")]
+  config: String,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Errors> {
   dotenv::dotenv().ok();
   sqlx::any::install_default_drivers();
 
-  let config = init_config().await?;
+  let args = Args::parse();
+
+  let config = init_config(&args.config).await?;
 
   create_dir_all(&config.objects_dir).await?;
 
@@ -45,8 +50,6 @@ async fn main() -> Result<(), Errors> {
     .init();
 
   let pool = init_pool().await?;
-
-  let _args = Args::parse();
 
   let cancellation_token = CancellationToken::new();
 

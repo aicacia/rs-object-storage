@@ -126,8 +126,9 @@ To build and deploy the service using Docker and Helm:
    ```bash
    docker run -it \
     -p 3000:3000 \
-    -v $(pwd)/config.json:/app/config.json \
-    -v $(pwd)/object-storage-dev.db:/app/object-storage-dev.db \
+    -v ${PWD}/.env:/app/.env \
+    -v ${PWD}/config.json:/app/config.json \
+    -v ${PWD}/object-storage-dev.db:/app/object-storage-dev.db \
     aicacia/object-storage-api:latest
    ```
 

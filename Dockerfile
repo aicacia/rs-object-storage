@@ -36,4 +36,4 @@ COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/object_storage
 
 ENV RUN_MODE=production
 
-CMD ["object_storage"]
+CMD ["object_storage", "-c", "/app/config.json"]
