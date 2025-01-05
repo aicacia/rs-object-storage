@@ -12,6 +12,7 @@ use object_storage::{
   service::peer::serve_peer,
 };
 use sqlx::Executor;
+use tokio::fs::create_dir_all;
 use tokio_util::sync::CancellationToken;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -25,6 +26,8 @@ async fn main() -> Result<(), Errors> {
   sqlx::any::install_default_drivers();
 
   let config = init_config().await?;
+
+  create_dir_all(&config.files_dir).await?;
 
   let level = tracing::Level::from_str(&config.log_level).unwrap_or(tracing::Level::DEBUG);
   tracing_subscriber::registry()
@@ -49,7 +52,11 @@ async fn main() -> Result<(), Errors> {
 
   let router = create_router(RouterState { pool: pool.clone() });
   let serve_handle = tokio::spawn(serve(router.clone(), cancellation_token.clone()));
-  let serve_peer_handle = tokio::spawn(serve_peer(router, cancellation_token.clone()));
+  let serve_peer_handle = if config.p2p.enabled {
+    Some(tokio::spawn(serve_peer(router, cancellation_token.clone())))
+  } else {
+    None
+  };
 
   shutdown_signal(cancellation_token).await;
 
@@ -59,10 +66,12 @@ async fn main() -> Result<(), Errors> {
       log::error!("Error serving: {}", e);
     }
   }
-  match serve_peer_handle.await {
-    Ok(_) => {}
-    Err(e) => {
-      log::error!("Error serving peer: {}", e);
+  if let Some(handle) = serve_peer_handle {
+    match handle.await {
+      Ok(_) => {}
+      Err(e) => {
+        log::error!("Error serving peer: {}", e);
+      }
     }
   }
   cleanup_pool(pool).await;

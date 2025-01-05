@@ -161,6 +161,48 @@
         "security": [{ "Authorization": [] }]
       }
     },
+    "/files/by-path/read": {
+      "get": {
+        "tags": ["file"],
+        "operationId": "read_file_by_path",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "", "content": { "*/*": {} } },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Errors" }
+              }
+            }
+          }
+        },
+        "security": [{ "Authorization": [] }]
+      }
+    },
     "/files/{file_id}": {
       "get": {
         "tags": ["file"],
@@ -401,10 +443,7 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": { "application/octet-stream": {} }
-          },
+          "200": { "description": "", "content": { "*/*": {} } },
           "401": {
             "description": "",
             "content": {
