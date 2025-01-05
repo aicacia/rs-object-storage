@@ -2,8 +2,7 @@ use std::{net::SocketAddr, str::FromStr};
 
 use axum::Router;
 use clap::Parser;
-use sqlx::Executor;
-use storage::{
+use object_storage::{
   core::{
     config::{get_config, init_config},
     database::init_pool,
@@ -12,6 +11,7 @@ use storage::{
   router::{create_router, RouterState},
   service::peer::serve_peer,
 };
+use sqlx::Executor;
 use tokio_util::sync::CancellationToken;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 

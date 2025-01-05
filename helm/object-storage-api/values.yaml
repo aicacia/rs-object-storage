@@ -12,38 +12,38 @@ replicas:
     stabilizationWindowSeconds: 15
 
 image:
-  repository: aicacia/storage-api
+  repository: aicacia/object-storage-api
   tag: latest
   pullPolicy: Always
   hash: sha256:41dc5087ec321069388b13f6f84535367df94b8691fe63fd043ba8832afbeb8b
 
 env:
-  DATABASE_URL: "sqlite:/data/storage-prod.db"
+  DATABASE_URL: "sqlite:/data/object-storage-prod.db"
 
 config:
   server:
-    url: https://api.storage.aicacia.com
+    url: https://api.object-storage.aicacia.com
 
 persistence:
-  storageClassName: linode-block-storage-retain
+  storageClassName: linode-block-object-storage-retain
   resources:
     requests:
-      storage: 10Gi
+      object-storage: 10Gi
 
 ingress:
   enabled: true
   ingressClassName: nginx
   annotations:
-    kubernetes.io/tls-acme: 'true'
+    kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt
   hosts:
-    - host: api.storage.aicacia.com
+    - host: api.object-storage.aicacia.com
       paths:
         - /
   tls:
-    - secretName: api-storage-aicacia-com-tls
+    - secretName: api-object-storage-aicacia-com-tls
       hosts:
-        - api.storage.aicacia.com
+        - api.object-storage.aicacia.com
 
 resources:
   requests:

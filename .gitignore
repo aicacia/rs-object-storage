@@ -6,6 +6,6 @@
 /!.env.example
 /config.json
 /!config.json.example
-/storage-dev.*
-/storage-service-account.json
+/object-storage-dev.*
+/object-storage-service-account.json
 /values.yaml

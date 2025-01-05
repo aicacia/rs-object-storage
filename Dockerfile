@@ -28,12 +28,12 @@ RUN touch /app/src/lib.rs && touch /app/src/main.rs
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
 FROM alpine:3.21
-LABEL org.opencontainers.image.source=https://github.com/aicacia/rs-storage
+LABEL org.opencontainers.image.source=https://github.com/aicacia/rs-object-storage
 
 WORKDIR /app
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/storage /usr/local/bin
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/object-storage /usr/local/bin
 
 ENV RUN_MODE=production
 
-CMD ["storage"]
+CMD ["object_storage"]

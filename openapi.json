@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "storage",
-    "description": "Aicacia Storage API provides blob services for applications.",
+    "title": "object-storage",
+    "description": "Aicacia Object Storage API provides blob services for applications.",
     "contact": { "name": "nathanfaucett@gmail.com" },
     "license": {
       "name": "MIT OR Apache-2.0",

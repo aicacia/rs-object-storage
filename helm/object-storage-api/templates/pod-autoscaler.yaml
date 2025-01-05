@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "storage-api.fullname" . }}
-  labels: {{- include "storage-api.labels" . | nindent 4 }}
+  name: {{ include "object-storage-api.fullname" . }}
+  labels: {{- include "object-storage-api.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "storage-api.fullname" . }}
+    name: {{ include "object-storage-api.fullname" . }}
   minReplicas: {{ .Values.replicas.min }}
   maxReplicas: {{ .Values.replicas.max }}
   behavior:

@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "storage-api.fullname" . }}
+  name: {{ include "object-storage-api.fullname" . }}
   labels:
-    {{- include "storage-api.labels" . | nindent 4 }}
+    {{- include "object-storage-api.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "storage-api.selectorLabels" . | nindent 6 }}
+      {{- include "object-storage-api.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -16,7 +16,7 @@ spec:
         checksum/config-config: {{ include (print $.Template.BasePath "/config-json.yaml") . | sha256sum }}
         image/hash: {{ .Values.image.hash }}
       labels:
-        {{- include "storage-api.selectorLabels" . | nindent 8 }}
+        {{- include "object-storage-api.selectorLabels" . | nindent 8 }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ include "storage-api.fullname" . }}-environment
+                name: {{ include "object-storage-api.fullname" . }}-environment
             {{- if .Values.envSecret }}
             - secretRef:
                 name: {{ .Values.envSecret }}
@@ -33,10 +33,10 @@ spec:
             - name: config-json
               mountPath: /app/config.json
               subPath: config.json
-            {{- if eq (include "storage-api.is-sqlite" .) "true" }}
+            {{- if eq (include "object-storage-api.is-sqlite" .) "true" }}
             - name: sqlite-pvc
-              mountPath: {{ dir (include "storage-api.sqlite-path" .) }}
-              subPath: {{ base (include "storage-api.sqlite-path" .) }}
+              mountPath: {{ dir (include "object-storage-api.sqlite-path" .) }}
+              subPath: {{ base (include "object-storage-api.sqlite-path" .) }}
             {{- end }}
           ports:
             - name: http
@@ -55,11 +55,11 @@ spec:
       volumes:
         - name: config-json
           configMap:
-            name: {{ include "storage-api.fullname" . }}-config
-        {{- if eq (include "storage-api.is-sqlite" .) "true" }}
+            name: {{ include "object-storage-api.fullname" . }}-config
+        {{- if eq (include "object-storage-api.is-sqlite" .) "true" }}
         - name: sqlite-pvc
           persistentVolumeClaim:
-            claimName: {{ include "storage-api.fullname" . }}-pvc
+            claimName: {{ include "object-storage-api.fullname" . }}-pvc
         {{- end -}}
       {{- with .Values.nodeSelector }}
       nodeSelector:

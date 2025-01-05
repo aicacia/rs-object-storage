@@ -1,9 +1,9 @@
-# Aicacia Storage API
+# Aicacia Object Storage API
 
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](LICENSE-MIT)
-![Test Status](https://github.com/aicacia/rs-storage/actions/workflows/test.yml/badge.svg)
+![Test Status](https://github.com/aicacia/rs-object-storage/actions/workflows/test.yml/badge.svg)
 
-Aicacia Storage API provides blob services for applications.
+Aicacia Object Storage API provides blob services for applications.
 
 ---
 
@@ -107,19 +107,19 @@ To build and deploy the service using Docker and Helm:
 1. **Build the Docker image:**
 
    ```bash
-   docker build -t aicacia/storage-api:latest .
+   docker build -t aicacia/object-storage-api:latest .
    ```
 
 2. **Push the image to the registry:**
 
    ```bash
-   docker push aicacia/storage-api:latest
+   docker push aicacia/object-storage-api:latest
    ```
 
 3. **Deploy with Helm:**
 
    ```bash
-   helm upgrade storage-api helm/storage-api -n api --install -f values.yaml --set image.hash="$(docker inspect --format='{{index .Id}}' aicacia/storage-api:latest)"
+   helm upgrade object-storage-api helm/object-storage-api -n api --install -f values.yaml --set image.hash="$(docker inspect --format='{{index .Id}}' aicacia/object-storage-api:latest)"
    ```
 
 4. **Deploy locally**
@@ -127,8 +127,8 @@ To build and deploy the service using Docker and Helm:
    docker run -it \
     -p 3000:3000 \
     -v $(pwd)/config.json:/app/config.json \
-    -v $(pwd)/storage-dev.db:/app/storage-dev.db \
-    aicacia/storage-api:latest
+    -v $(pwd)/object-storage-dev.db:/app/object-storage-dev.db \
+    aicacia/object-storage-api:latest
    ```
 
 ### Undeployment
@@ -136,5 +136,5 @@ To build and deploy the service using Docker and Helm:
 To undeploy the service:
 
 ```bash
-helm delete -n api storage-api
+helm delete -n api object-storage-api
 ```
