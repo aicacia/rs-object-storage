@@ -1,10 +1,13 @@
+/.cargo/config.toml
 /.github
 /.vscode
 /helm
+/target/debug
+/target/release
 /.env*
 /config.json
 /!config.json.example
 /object-storage-dev.*
-/object-storage-service-account.json
+/object-storage-admin-service-account.json
 /docker-compose.yaml
 /values.yaml
