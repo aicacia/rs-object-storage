@@ -1,9 +1,6 @@
-/.cargo
 /.github
 /.vscode
 /helm
-/target
-/.cargo
 /.env*
 /config.json
 /!config.json.example

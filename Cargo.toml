@@ -75,13 +75,11 @@ sqlx = { version = "0.8", default-features = false, features = [
   "all-databases",
 ] }
 uuid = { version = "1.11", features = ["serde", "v4"] }
-atomicoption = { git = "https://github.com/aicacia/rs-atomic-option.git", rev = "f5cc802" }
+atomicoption = "0.1"
 # peer server deps
-webrtc-http = { git = "https://github.com/aicacia/rs-webrtc-http.git", rev = "7a1b0ec", features = [
-  "axum",
-] }
-peer = { git = "https://github.com/aicacia/rs-peer.git" }
-webrtc = "*"
+webrtc-http = { version = "0.1", features = ["axum"] }
+webrtc-p2p = "0.1"
+webrtc = "0.12"
 async-tungstenite = { version = "0.28", default-features = false, features = [
   "tokio-runtime",
   "tokio-rustls-native-certs",
@@ -99,7 +97,7 @@ opt-level = 3
 
 [profile.release]
 codegen-units = 1
-lto = true
-opt-level = "z"
+lto = "thin"
+opt-level = "s"
 panic = "abort"
 strip = true

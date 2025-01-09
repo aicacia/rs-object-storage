@@ -3,7 +3,6 @@ use std::sync::Arc;
 use async_tungstenite::tokio::connect_async;
 use dashmap::DashMap;
 use futures_util::StreamExt;
-use peer::{peer::SignalMessage, Peer, PeerOptions};
 use serde::{Deserialize, Serialize};
 use tokio::sync::{Mutex, RwLock};
 use tokio_util::sync::CancellationToken;
@@ -16,6 +15,7 @@ use webrtc::{
   peer_connection::configuration::RTCConfiguration,
 };
 use webrtc_http::server::RTCListener;
+use webrtc_p2p::{peer::SignalMessage, Peer, PeerOptions};
 
 use crate::core::{config::get_config, error::Errors};
 

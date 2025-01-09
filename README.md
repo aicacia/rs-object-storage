@@ -107,29 +107,35 @@ To build and deploy the service using Docker and Helm:
 1. **Build the Docker image:**
 
    ```bash
-   docker build -t aicacia/object-storage-api:latest .
+   # build for x86_64
+   docker build -t aicacia/object-storage-api:0.1-x86_64 .
+
+   # build for armv7
+   cross build --target armv7-unknown-linux-musleabihf --release
+   docker buildx build --no-cache -o type=docker --push --platform linux/arm/v7 --build-arg=TARGET=armv7-unknown-linux-musleabihf -t aicacia/object-storage-api:0.1-armv7 -f Dockerfile.local-target .
    ```
 
 2. **Push the image to the registry:**
 
    ```bash
-   docker push aicacia/object-storage-api:latest
+   docker push aicacia/object-storage-api:0.1-x86_64
    ```
 
 3. **Deploy with Helm:**
 
    ```bash
-   helm upgrade object-storage-api helm/object-storage-api -n api --install -f values.yaml --set image.hash="$(docker inspect --format='{{index .Id}}' aicacia/object-storage-api:latest)"
+   helm upgrade object-storage-api helm/object-storage-api -n api --install -f values.yaml --set image.hash="$(docker inspect --format='{{index .Id}}' aicacia/object-storage-api:0.1-x86_64)"
    ```
 
 4. **Deploy locally**
+
    ```bash
    docker run -it \
     -p 3000:3000 \
     -v ${PWD}/.env:/app/.env \
     -v ${PWD}/config.json:/app/config.json \
     -v ${PWD}/object-storage-dev.db:/app/object-storage-dev.db \
-    aicacia/object-storage-api:latest
+    aicacia/object-storage-api:0.1-x86_64
    ```
 
 ### Undeployment
