@@ -489,7 +489,6 @@
     "/openapi.json": {
       "get": {
         "tags": ["openapi"],
-        "operationId": "get_openapi",
         "responses": { "200": { "description": "OpenApi documenation" } }
       }
     },
@@ -592,8 +591,8 @@
     }
   },
   "tags": [
-    { "name": "object", "description": "Objects" },
-    { "name": "openapi", "description": "OpenApi endpoints" },
-    { "name": "util", "description": "Utility endpoints" }
+    { "name": "object", "description": "Object endpoints" },
+    { "name": "util", "description": "Utility endpoints" },
+    { "name": "openapi", "description": "OpenApi endpoints" }
   ]
 }
