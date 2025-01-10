@@ -6,7 +6,7 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 name = "object-storage"
 repository = "https://github.com/aicacia/rs-object-storage"
-rust-version = "1.82"
+rust-version = "1.75"
 version = "0.1.0"
 
 [lib]
@@ -18,9 +18,28 @@ name = "object_storage"
 path = "src/main.rs"
 
 [dependencies]
-dotenv = "0.15"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+dotenv = { version = "0.15", default-features = false }
+config = { version = "0.15", default-features = false, features = ["json"] }
+
+clap = { version = "4.5", default-features = false, features = [
+  "std",
+  "derive",
+  "help",
+] }
+
+log = { version = "0.4", default-features = false }
+tracing = { version = "0.1", default-features = false, features = ["std"] }
+tracing-subscriber = { version = "0.3", default-features = false, features = [
+  "ansi",
+  "fmt",
+  "std",
+  "tracing-log",
+  "env-filter",
+] }
+
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0", default-features = false }
+
 axum = { version = "0.8", default-features = false, features = [
   "tokio",
   "http1",
@@ -35,36 +54,28 @@ utoipa = { version = "5.3", default-features = false, features = [
   "uuid",
   "macros",
 ] }
-# TODO: use when supports 8.0
-# utoipa-axum = { version = "0.2", default-features = false }
-clap = { version = "4.5", default-features = false, features = [
-  "std",
-  "derive",
-  "help",
+utoipa-axum = { version = "0.1", default-features = false }
+
+http = { version = "1.2", default-features = false }
+tower-http = { version = "0.6", default-features = false, features = [
+  "cors",
+  "trace",
 ] }
-config = "0.15"
-http = "1.2"
-tokio = { version = "1.42", default-features = false, features = [
-  "rt",
+reqwest = { version = "0.12", default-features = false, features = [
+  "rustls-tls",
+  "json",
+] }
+
+tokio = { version = "1.43", default-features = false, features = [
   "fs",
+  "rt",
   "rt-multi-thread",
   "macros",
   "signal",
 ] }
 tokio-util = { version = "0.7", default-features = false, features = ["io"] }
-futures-util = { version = "*", default-features = false }
-lazy_static = "1.5"
-reqwest = { version = "0.12", default-features = false, features = [
-  "rustls-tls",
-  "json",
-] }
-validator = { version = "0.19", features = ["derive"] }
-log = "0.4"
-build-time = "0.1"
-chrono = { version = "0.4", features = ["serde"] }
-tower-http = { version = "0.6", features = ["cors", "trace"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+futures-util = { version = "0.3", default-features = false }
+
 sqlx = { version = "0.8", default-features = false, features = [
   "uuid",
   "chrono",
@@ -74,18 +85,26 @@ sqlx = { version = "0.8", default-features = false, features = [
   "runtime-tokio-rustls",
   "all-databases",
 ] }
+
+validator = { version = "0.19", default-features = false, features = [
+  "derive",
+] }
+lazy_static = { version = "1.5", default-features = false }
+build-time = { version = "0.1", default-features = false }
+chrono = { version = "0.4", default-features = false, features = ["serde"] }
 uuid = { version = "1.11", features = ["serde", "v4"] }
 atomicoption = "0.1"
+
 # peer server deps
 webrtc-http = { version = "0.1", features = ["axum"] }
 webrtc-p2p = "0.1"
-webrtc = "0.12"
+webrtc = { version = "0.12", default-features = false }
 async-tungstenite = { version = "0.28", default-features = false, features = [
   "tokio-runtime",
   "tokio-rustls-native-certs",
 ] }
-urlencoding = "2.1"
-dashmap = "6.1"
+urlencoding = { version = "2.1", default-features = false }
+dashmap = { version = "6.1", default-features = false }
 
 [dev-dependencies]
 

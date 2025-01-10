@@ -7,7 +7,9 @@ use crate::{
   },
   middleware::{authorization::Authorization, json::Json},
   model::{
-    object::{CreateObjectRequest, Object, ObjectQuery, ObjectsQuery, MoveObjectRequest, UploadPartRequest},
+    object::{
+      CreateObjectRequest, MoveObjectRequest, Object, ObjectQuery, ObjectsQuery, UploadPartRequest,
+    },
     util::{OffsetAndLimit, Pagination},
   },
   repository, service,
@@ -18,38 +20,19 @@ use axum::{
   extract::{Multipart, Path, Query, State},
   http::{header, StatusCode},
   response::IntoResponse,
-  routing::{delete, get, post, put},
-  Router,
 };
 use tokio::fs;
 use tokio_util::io::ReaderStream;
-use utoipa::OpenApi;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::RouterState;
 
-#[derive(OpenApi)]
-#[openapi(
-  paths(
-    get_objects,
-    get_object_by_path,
-    get_object_by_id,
-    read_object_by_id,
-    read_object_by_path,
-    create_object,
-    append_object,
-    move_object,
-    delete_object
-  ),
-  tags(
-    (name = "object", description = "Objects"),
-  )
-)]
-pub struct ApiDoc;
+pub const OBJECT_TAG: &str = "object";
 
 #[utoipa::path(
   get,
-  path = "objects",
-  tags = ["object"],
+  path = "/objects",
+  tags = [OBJECT_TAG],
   params(
     OffsetAndLimit,
     ObjectsQuery,
@@ -95,8 +78,8 @@ pub async fn get_objects(
 
 #[utoipa::path(
   get,
-  path = "objects/by-path",
-  tags = ["object"],
+  path = "/objects/by-path",
+  tags = [OBJECT_TAG],
   params(
     ObjectQuery,
   ),
@@ -137,8 +120,8 @@ pub async fn get_object_by_path(
 
 #[utoipa::path(
   get,
-  path = "objects/{object_id}",
-  tags = ["object"],
+  path = "/objects/{object_id}",
+  tags = [OBJECT_TAG],
   responses(
     (status = 200, content_type = "application/json", body = Object),
     (status = 401, content_type = "application/json", body = Errors),
@@ -175,8 +158,8 @@ pub async fn get_object_by_id(
 
 #[utoipa::path(
   get,
-  path = "objects/{object_id}/read",
-  tags = ["object"],
+  path = "/objects/{object_id}/read",
+  tags = [OBJECT_TAG],
   responses(
     (status = 200, content_type = "*/*"),
     (status = 401, content_type = "application/json", body = Errors),
@@ -241,8 +224,8 @@ pub async fn read_object_by_id(
 
 #[utoipa::path(
   get,
-  path = "objects/by-path/read",
-  tags = ["object"],
+  path = "/objects/by-path/read",
+  tags = [OBJECT_TAG],
   params(
     ObjectQuery,
   ),
@@ -310,8 +293,8 @@ pub async fn read_object_by_path(
 
 #[utoipa::path(
   post,
-  path = "objects",
-  tags = ["object"],
+  path = "/objects",
+  tags = [OBJECT_TAG],
   request_body = CreateObjectRequest,
   responses(
     (status = 201, content_type = "application/json", body = Object),
@@ -343,8 +326,8 @@ pub async fn create_object(
 
 #[utoipa::path(
   put,
-  path = "objects/{object_id}/append",
-  tags = ["object"],
+  path = "/objects/{object_id}/append",
+  tags = [OBJECT_TAG],
   request_body(content = UploadPartRequest, content_type = "multipart/form-data"),
   responses(
     (status = 200, content_type = "application/json", body = usize),
@@ -437,8 +420,8 @@ pub async fn append_object(
 
 #[utoipa::path(
   put,
-  path = "objects/{object_id}/move",
-  tags = ["object"],
+  path = "/objects/{object_id}/move",
+  tags = [OBJECT_TAG],
   request_body = MoveObjectRequest,
   responses(
     (status = 200, content_type = "application/json", body = Object),
@@ -484,8 +467,8 @@ pub async fn move_object(
 
 #[utoipa::path(
   delete,
-  path = "objects/{object_id}",
-  tags = ["object"],
+  path = "/objects/{object_id}",
+  tags = [OBJECT_TAG],
   responses(
     (status = 204),
     (status = 400, content_type = "application/json", body = Errors),
@@ -520,16 +503,16 @@ pub async fn delete_object(
   (StatusCode::NO_CONTENT, ()).into_response()
 }
 
-pub fn create_router(state: RouterState) -> Router {
-  Router::new()
-    .route("/objects", get(get_objects))
-    .route("/objects/by-path", get(get_object_by_path))
-    .route("/objects/{object_id}", get(get_object_by_id))
-    .route("/objects/{object_id}/read", get(read_object_by_id))
-    .route("/objects/by-path/read", get(read_object_by_path))
-    .route("/objects", post(create_object))
-    .route("/objects/{object_id}/append", put(append_object))
-    .route("/objects/{object_id}/move", put(move_object))
-    .route("/objects/{object_id}", delete(delete_object))
+pub fn create_router(state: RouterState) -> OpenApiRouter {
+  OpenApiRouter::new()
+    .routes(routes!(get_objects))
+    .routes(routes!(get_object_by_path))
+    .routes(routes!(get_object_by_id))
+    .routes(routes!(read_object_by_id))
+    .routes(routes!(read_object_by_path))
+    .routes(routes!(create_object))
+    .routes(routes!(append_object))
+    .routes(routes!(move_object))
+    .routes(routes!(delete_object))
     .with_state(state)
 }

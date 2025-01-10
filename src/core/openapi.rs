@@ -1,7 +1,12 @@
 use utoipa::{
-  openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme},
+  openapi::{
+    security::{HttpAuthScheme, HttpBuilder, SecurityScheme},
+    Server,
+  },
   Modify,
 };
+
+use super::config::get_config;
 
 pub const AUTHORIZATION_HEADER: &str = "Authorization";
 
@@ -19,5 +24,17 @@ impl Modify for SecurityAddon {
           .build(),
       ),
     );
+  }
+}
+
+pub struct ServersAddon;
+
+impl Modify for ServersAddon {
+  fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+    let config = get_config();
+    openapi
+      .servers
+      .get_or_insert(Vec::default())
+      .push(Server::new(config.server.url.clone()));
   }
 }
