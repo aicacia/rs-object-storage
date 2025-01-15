@@ -5,13 +5,12 @@ use clap::Parser;
 use object_storage::{
   core::{
     config::{get_config, init_config},
-    database::init_pool,
+    database::{close_pool, init_pool},
     error::Errors,
   },
   router::{create_router, RouterState},
   service::peer::serve_peer,
 };
-use sqlx::Executor;
 use tokio::fs::create_dir_all;
 use tokio_util::sync::CancellationToken;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -77,35 +76,14 @@ async fn main() -> Result<(), Errors> {
       }
     }
   }
-  cleanup_pool(pool).await;
-
-  Ok(())
-}
-
-async fn cleanup_pool(pool: sqlx::AnyPool) {
-  match pool.acquire().await {
-    Ok(conn) => match conn.backend_name().to_lowercase().as_str() {
-      "sqlite" => {
-        log::info!("Optimizing database");
-        match pool
-          .execute("PRAGMA analysis_limit=400; PRAGMA optimize;")
-          .await
-        {
-          Ok(_) => {
-            log::info!("Optimized database");
-          }
-          Err(e) => {
-            log::error!("Error optimizing database: {}", e);
-          }
-        }
-      }
-      _ => {}
-    },
+  match close_pool().await {
+    Ok(_) => {}
     Err(e) => {
-      log::error!("Error acquiring connection: {}", e);
+      log::error!("Error closing pool: {}", e);
     }
   }
-  pool.close().await;
+
+  Ok(())
 }
 
 async fn serve(router: Router, cancellation_token: CancellationToken) -> Result<(), Errors> {
