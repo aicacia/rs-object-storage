@@ -145,3 +145,10 @@ To undeploy the service:
 ```bash
 helm delete -n api object-storage-api
 ```
+
+## OpenAPI Client
+
+```bash
+rm -rf object-storage-client && \
+openapi-generator-cli generate -i ./openapi.json -g rust -o 'object-storage-client' --additional-properties=packageName=object-storage-client,library=hyper,bestFitInt=true,avoidBoxedModels=true
+```

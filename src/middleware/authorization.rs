@@ -1,3 +1,4 @@
+use auth_client::apis::JwtApi;
 use axum::extract::{FromRef, FromRequestParts};
 use http::request::Parts;
 
@@ -7,7 +8,7 @@ use crate::{
     openapi::AUTHORIZATION_HEADER,
   },
   router::RouterState,
-  service::auth::{auth_is_jwt_valid, Claims},
+  service::auth::{jwt_api_client, Claims},
 };
 
 pub const TOKEN_TYPE_BEARER: &str = "bearer";
@@ -37,10 +38,19 @@ where
           return Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR));
         }
       };
-      let claims = match auth_is_jwt_valid(authorization_string).await {
+      let claims_value = match jwt_api_client(authorization_string).jwt_is_valid().await {
+        Ok(claims_value) => claims_value,
+        Err(e) => {
+          log::error!("failed to validate authorization header: {:?}", e);
+          return Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR));
+        }
+      };
+      let claims = match serde_json::from_value(serde_json::Value::Object(
+        serde_json::Map::from_iter(claims_value.into_iter()),
+      )) {
         Ok(claims) => claims,
         Err(e) => {
-          log::error!("failed to validate authorization header: {}", e);
+          log::error!("failed to parse auth jwt claims response: {:?}", e);
           return Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR));
         }
       };

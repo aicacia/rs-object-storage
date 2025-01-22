@@ -54,9 +54,16 @@ utoipa = { version = "5.3", default-features = false, features = [
   "uuid",
   "macros",
 ] }
-utoipa-axum = { version = "0.1", default-features = false }
+utoipa-axum = { version = "0.2", default-features = false }
 
 http = { version = "1.2", default-features = false }
+http-body-util = { version = "0.1", default-features = false }
+hyper-util = { version = "0.1", default-features = false, features = [
+  "client",
+  "client-legacy",
+  "http1",
+  "http2",
+] }
 tower-http = { version = "0.6", default-features = false, features = [
   "cors",
   "trace",
@@ -95,6 +102,8 @@ chrono = { version = "0.4", default-features = false, features = ["serde"] }
 uuid = { version = "1.11", features = ["serde", "v4"] }
 atomicoption = "0.1"
 
+auth-client = { git = "https://github.com/aicacia/rs-auth.git", rev = "f6bf8e9" }
+
 # peer server deps
 webrtc-http = { version = "0.1", features = ["axum"] }
 webrtc-p2p = "0.1"
@@ -107,6 +116,9 @@ urlencoding = { version = "2.1", default-features = false }
 dashmap = { version = "6.1", default-features = false }
 
 [dev-dependencies]
+
+[workspace]
+members = ["object-storage-client"]
 
 [profile.dev]
 opt-level = 1

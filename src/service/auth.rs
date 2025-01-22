@@ -1,48 +1,56 @@
-use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, sync::Arc};
+
+use auth_client::{
+  apis::{
+    configuration::{ApiKey, Configuration},
+    JwtApi, JwtApiClient, TokenApi, TokenApiClient,
+  },
+  models::{
+    token_request_service_account::GrantType, JwtRequest, Token, TokenRequest,
+    TokenRequestServiceAccount,
+  },
+};
+use hyper_util::{
+  client::legacy::{connect::HttpConnector, Client},
+  rt::TokioExecutor,
+};
+use serde::Deserialize;
 use tokio::sync::RwLock;
 
-use crate::core::config::get_config;
+use crate::core::{config::get_config, error::Errors};
 
 lazy_static! {
   static ref SERVICE_ACCOUNT_TOKEN: RwLock<Option<(Token, i64)>> = RwLock::new(None);
+  static ref CLIENT: Client<HttpConnector, String> =
+    Client::builder(TokioExecutor::new()).build_http();
 }
 
-#[derive(Serialize)]
-pub struct JWTRequest {
-  pub tenant_id: i64,
-  pub claims: serde_json::Map<String, serde_json::Value>,
+pub fn jwt_api_client(token: &str) -> impl JwtApi {
+  let mut configuration = Configuration::with_client(CLIENT.clone());
+  configuration.api_key = Some(ApiKey {
+    prefix: Some("Bearer".to_owned()),
+    key: token.to_owned(),
+  });
+  JwtApiClient::new(Arc::new(configuration))
 }
 
-pub async fn create_jwt(
-  claims: serde_json::Map<String, serde_json::Value>,
-) -> Result<String, reqwest::Error> {
-  let config = get_config();
-  let body = JWTRequest {
-    tenant_id: config.p2p.tenant_id,
-    claims,
-  };
+pub fn token_api_client() -> impl TokenApi {
+  TokenApiClient::new(Arc::new(Configuration::with_client(CLIENT.clone())))
+}
+
+pub async fn create_jwt(claims: HashMap<String, serde_json::Value>) -> Result<String, Errors> {
   let service_account_token = get_service_account_token().await?;
-  reqwest::Client::new()
-    .post(format!("{}/jwt", config.auth.uri))
-    .bearer_auth(service_account_token)
-    .json(&body)
-    .send()
-    .await?
-    .text()
-    .await
+  let jwt_api = jwt_api_client(&service_account_token);
+  let jwt = jwt_api
+    .create_jwt(JwtRequest {
+      tenant_id: get_config().p2p.tenant_id,
+      claims,
+    })
+    .await?;
+  Ok(jwt)
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "grant_type")]
-pub enum TokenRequest {
-  #[serde(rename = "service-account")]
-  ServiceAccount {
-    client_id: uuid::Uuid,
-    client_secret: uuid::Uuid,
-  },
-}
-
-pub async fn get_service_account_token() -> Result<String, reqwest::Error> {
+pub async fn get_service_account_token() -> Result<String, auth_client::apis::Error> {
   let now = chrono::Utc::now().timestamp();
   if let Some((token, iss_at)) = SERVICE_ACCOUNT_TOKEN.read().await.as_ref() {
     if now < iss_at + token.expires_in {
@@ -59,35 +67,17 @@ pub async fn get_service_account_token() -> Result<String, reqwest::Error> {
   Ok(access_token)
 }
 
-#[derive(Debug, Deserialize)]
-pub struct Token {
-  pub access_token: String,
-  pub token_type: String,
-  pub issued_token_type: Option<String>,
-  pub expires_in: i64,
-  pub scope: Option<String>,
-  pub refresh_token: Option<String>,
-  pub refresh_token_expires_in: Option<i64>,
-  pub id_token: Option<String>,
-}
-
-async fn create_service_account_token() -> Result<Token, reqwest::Error> {
+async fn create_service_account_token() -> Result<Token, auth_client::apis::Error> {
   let config = get_config();
-  let body = TokenRequest::ServiceAccount {
+  let token_request = TokenRequest::TokenRequestServiceAccount(TokenRequestServiceAccount {
+    grant_type: GrantType::ServiceAccount,
     client_id: config.auth.service_account.client_id,
     client_secret: config.auth.service_account.client_secret,
-  };
-  reqwest::Client::new()
-    .post(format!("{}/token", config.auth.uri))
-    .header("Tenant-ID", config.auth.tenant_client_id.to_string())
-    .json(&body)
-    .send()
-    .await?
-    .json::<Token>()
-    .await
+  });
+  token_api_client().token(token_request).await
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, Default, Clone)]
 pub struct Claims {
   #[serde(rename = "type")]
   pub kind: String,
@@ -102,16 +92,4 @@ pub struct Claims {
   pub sub: i64,
   pub app: i64,
   pub scopes: Vec<String>,
-}
-
-pub async fn auth_is_jwt_valid(token: &str) -> Result<Claims, reqwest::Error> {
-  let config = get_config();
-  reqwest::Client::new()
-    .get(format!("{}/jwt", config.auth.uri))
-    .bearer_auth(token)
-    .header("Tenant-ID", config.auth.tenant_client_id.to_string())
-    .send()
-    .await?
-    .json::<Claims>()
-    .await
 }

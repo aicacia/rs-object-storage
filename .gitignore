@@ -9,3 +9,10 @@
 /object-storage-dev.*
 /object-storage-service-account.json
 /values.yaml
+
+# object-storage-client
+/object-storage-client/.openapi-generator
+/object-storage-client/.openapi-generator-ignore
+/object-storage-client/.travis.yml
+/object-storage-client/git_push.sh
+/openapitools.json

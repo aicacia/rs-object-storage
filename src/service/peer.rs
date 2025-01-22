@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use async_tungstenite::tokio::connect_async;
 use dashmap::DashMap;
@@ -190,7 +190,7 @@ pub struct OutgoingMessage {
 }
 
 #[derive(Serialize)]
-pub struct AuthenticateBody {
+pub struct ServerAuthenticateRequest {
   id: String,
   password: String,
 }
@@ -199,28 +199,29 @@ lazy_static! {
   static ref AUTH_P2P_TOKEN: RwLock<Option<(String, i64)>> = RwLock::new(None);
 }
 
-async fn create_p2p_ws_server_token() -> Result<String, reqwest::Error> {
+async fn create_p2p_ws_server_token() -> Result<String, Errors> {
   let config = get_config();
-  let body = AuthenticateBody {
+  let body = ServerAuthenticateRequest {
     id: config.p2p.id.clone(),
     password: config.p2p.password.clone(),
   };
-  reqwest::Client::new()
+  let p2p_ws_server_token = reqwest::Client::new()
     .post(format!("{}/server", config.p2p.api_uri))
     .bearer_auth(create_p2p_token().await?)
     .json(&body)
     .send()
     .await?
     .text()
-    .await
+    .await?;
+  Ok(p2p_ws_server_token)
 }
 
-fn create_p2p_claims() -> (serde_json::Map<String, serde_json::Value>, i64) {
+fn create_p2p_claims() -> (HashMap<String, serde_json::Value>, i64) {
   let config = get_config();
   let now = chrono::Utc::now().timestamp();
   let expires_seconds = 5 * 60;
   let expires_at = now + expires_seconds;
-  let mut claims = serde_json::Map::new();
+  let mut claims = HashMap::new();
   claims.insert("iss".to_owned(), serde_json::json!("P2P"));
   claims.insert("iat".to_owned(), serde_json::json!(now));
   claims.insert("exp".to_owned(), serde_json::json!(expires_at));
@@ -229,7 +230,7 @@ fn create_p2p_claims() -> (serde_json::Map<String, serde_json::Value>, i64) {
   (claims, expires_at)
 }
 
-async fn create_p2p_token() -> Result<String, reqwest::Error> {
+async fn create_p2p_token() -> Result<String, Errors> {
   let now = chrono::Utc::now().timestamp();
   if let Some((token, expires_at)) = AUTH_P2P_TOKEN.read().await.as_ref() {
     if now < *expires_at {
