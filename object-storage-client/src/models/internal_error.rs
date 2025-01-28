@@ -12,16 +12,16 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Errors {
+pub struct InternalError {
     #[serde(rename = "messages")]
     pub messages: std::collections::HashMap<String, Vec<models::ErrorMessage>>,
     #[serde(rename = "status_code")]
     pub status_code: i32,
 }
 
-impl Errors {
-    pub fn new(messages: std::collections::HashMap<String, Vec<models::ErrorMessage>>, status_code: i32) -> Errors {
-        Errors {
+impl InternalError {
+    pub fn new(messages: std::collections::HashMap<String, Vec<models::ErrorMessage>>, status_code: i32) -> InternalError {
+        InternalError {
             messages,
             status_code,
         }

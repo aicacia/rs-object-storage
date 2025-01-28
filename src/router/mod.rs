@@ -8,7 +8,7 @@ use object::OBJECT_TAG;
 use openapi::OPENAPI_TAG;
 use p2p::P2P_TAG;
 use sqlx::AnyPool;
-use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLayer};
 use util::UTIL_TAG;
 use utoipa::OpenApi;
 use utoipa_axum::router::OpenApiRouter;
@@ -47,5 +47,6 @@ pub fn create_router(state: RouterState) -> Router {
     .merge(openapi::create_router(openapi))
     .layer(CorsLayer::very_permissive())
     .layer(TraceLayer::new_for_http())
+    .layer(CompressionLayer::new().gzip(true))
     .into()
 }

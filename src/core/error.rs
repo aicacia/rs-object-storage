@@ -91,13 +91,15 @@ impl ErrorMessages {
   }
 }
 
+pub type Errors = HashMap<String, ErrorMessages>;
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema)]
-pub struct Errors {
+pub struct InternalError {
   status_code: u16,
   messages: HashMap<String, ErrorMessages>,
 }
 
-impl fmt::Display for Errors {
+impl fmt::Display for InternalError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
     match serde_json::to_string(self) {
       Ok(json) => write!(f, "{}", json),
@@ -109,7 +111,7 @@ impl fmt::Display for Errors {
   }
 }
 
-impl From<StatusCode> for Errors {
+impl From<StatusCode> for InternalError {
   fn from(status_code: StatusCode) -> Self {
     Self {
       status_code: status_code.as_u16(),
@@ -118,7 +120,7 @@ impl From<StatusCode> for Errors {
   }
 }
 
-impl From<ValidationErrors> for Errors {
+impl From<ValidationErrors> for InternalError {
   fn from(validation_errors: ValidationErrors) -> Self {
     let mut new = Self::bad_request();
     handle_validation_errors(&mut new, &mut String::new(), &validation_errors);
@@ -126,55 +128,49 @@ impl From<ValidationErrors> for Errors {
   }
 }
 
-impl From<io::Error> for Errors {
+impl From<io::Error> for InternalError {
   fn from(error: io::Error) -> Self {
     Self::internal_error().with_application_error(error.to_string())
   }
 }
 
-impl From<serde_json::Error> for Errors {
-  fn from(error: serde_json::Error) -> Self {
-    Self::internal_error().with_application_error(error.to_string())
-  }
-}
-
-impl From<sqlx::Error> for Errors {
+impl From<sqlx::Error> for InternalError {
   fn from(error: sqlx::Error) -> Self {
     Self::internal_error().with_application_error(error.to_string())
   }
 }
 
-impl From<config::ConfigError> for Errors {
+impl From<config::ConfigError> for InternalError {
   fn from(error: config::ConfigError) -> Self {
     Self::internal_error().with_application_error(error.to_string())
   }
 }
 
-impl From<webrtc::Error> for Errors {
+impl From<webrtc::Error> for InternalError {
   fn from(error: webrtc::Error) -> Self {
     Self::internal_error().with_application_error(error.to_string())
   }
 }
 
-impl From<reqwest::Error> for Errors {
+impl From<reqwest::Error> for InternalError {
   fn from(error: reqwest::Error) -> Self {
     Self::internal_error().with_application_error(error.to_string())
   }
 }
 
-impl From<async_tungstenite::tungstenite::Error> for Errors {
+impl From<async_tungstenite::tungstenite::Error> for InternalError {
   fn from(error: async_tungstenite::tungstenite::Error) -> Self {
     Self::internal_error().with_application_error(error.to_string())
   }
 }
 
-impl From<http::Error> for Errors {
-  fn from(error: http::Error) -> Self {
+impl From<serde_json::Error> for InternalError {
+  fn from(error: serde_json::Error) -> Self {
     Self::internal_error().with_application_error(error.to_string())
   }
 }
 
-impl From<auth_client::apis::ApiError> for Errors {
+impl From<auth_client::apis::ApiError> for InternalError {
   fn from(error: auth_client::apis::ApiError) -> Self {
     let code = error.code;
     let body = error.body;
@@ -194,14 +190,16 @@ impl From<auth_client::apis::ApiError> for Errors {
   }
 }
 
-impl From<auth_client::apis::Error> for Errors {
+impl From<auth_client::apis::Error> for InternalError {
   fn from(error: auth_client::apis::Error) -> Self {
     match error {
       auth_client::apis::Error::Api(api_error) => Self::from(api_error),
       auth_client::apis::Error::Header(_header_error) => {
         Self::internal_error().with_error("header", INVALID_ERROR)
       }
-      auth_client::apis::Error::Http(http_error) => Self::from(http_error),
+      auth_client::apis::Error::Http(http_error) => {
+        Self::internal_error().with_application_error(http_error.to_string())
+      }
       auth_client::apis::Error::Hyper(hyper_error) => {
         Self::internal_error().with_application_error(hyper_error.to_string())
       }
@@ -216,7 +214,7 @@ impl From<auth_client::apis::Error> for Errors {
   }
 }
 
-impl IntoResponse for Errors {
+impl IntoResponse for InternalError {
   fn into_response(self) -> Response {
     match StatusCode::from_u16(self.status_code) {
       Ok(status_code) => (status_code, axum::Json(self.messages)).into_response(),
@@ -233,7 +231,7 @@ impl IntoResponse for Errors {
   }
 }
 
-impl Errors {
+impl InternalError {
   pub fn bad_request() -> Self {
     Self::from(StatusCode::BAD_REQUEST)
   }
@@ -288,7 +286,7 @@ impl Errors {
 }
 
 fn handle_validation_errors(
-  errors: &mut Errors,
+  errors: &mut InternalError,
   current_name: &str,
   validation_errors: &ValidationErrors,
 ) {
@@ -304,7 +302,7 @@ fn handle_validation_errors(
 }
 
 fn handle_validation_errors_kind(
-  errors: &mut Errors,
+  errors: &mut InternalError,
   current_name: &str,
   error_kind: &ValidationErrorsKind,
 ) {

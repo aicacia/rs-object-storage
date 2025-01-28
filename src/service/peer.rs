@@ -17,14 +17,14 @@ use webrtc::{
 use webrtc_http::server::RTCListener;
 use webrtc_p2p::{peer::SignalMessage, Peer, PeerOptions};
 
-use crate::core::{config::get_config, error::Errors};
+use crate::core::{config::get_config, error::InternalError};
 
 use super::auth;
 
 pub async fn serve_peer(
   router: axum::Router,
   cancellation_token: CancellationToken,
-) -> Result<(), Errors> {
+) -> Result<(), InternalError> {
   let mut m = MediaEngine::default();
   let registry = register_default_interceptors(Registry::new(), &mut m)?;
 
@@ -68,7 +68,7 @@ async fn ws_serve_peer(
   peer_options: PeerOptions,
   router: axum::Router,
   cancellation_token: CancellationToken,
-) -> Result<(), Errors> {
+) -> Result<(), InternalError> {
   let ws_server_token = create_p2p_ws_server_token().await?;
   let ws_url = format!(
     "{}/server/websocket?token={}",
@@ -84,7 +84,7 @@ async fn ws_serve_peer(
   while let Some(msg_result) = socket.lock().await.next().await {
     let msg = msg_result?;
     if msg.is_close() {
-      return Err(Errors::internal_error().with_application_error("socket closed"));
+      return Err(InternalError::internal_error().with_application_error("socket closed"));
     }
     let data = msg.into_data().to_vec();
     let json = serde_json::from_slice::<IncomingMessage>(&data)?;
@@ -199,7 +199,7 @@ lazy_static! {
   static ref AUTH_P2P_TOKEN: RwLock<Option<(String, i64)>> = RwLock::new(None);
 }
 
-async fn create_p2p_ws_server_token() -> Result<String, Errors> {
+async fn create_p2p_ws_server_token() -> Result<String, InternalError> {
   let config = get_config();
   let body = ServerAuthenticateRequest {
     id: config.p2p.id.clone(),
@@ -230,7 +230,7 @@ fn create_p2p_claims() -> (HashMap<String, serde_json::Value>, i64) {
   (claims, expires_at)
 }
 
-async fn create_p2p_token() -> Result<String, Errors> {
+async fn create_p2p_token() -> Result<String, InternalError> {
   let now = chrono::Utc::now().timestamp();
   if let Some((token, expires_at)) = AUTH_P2P_TOKEN.read().await.as_ref() {
     if now < *expires_at {

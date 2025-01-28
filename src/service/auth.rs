@@ -17,7 +17,7 @@ use hyper_util::{
 use serde::Deserialize;
 use tokio::sync::RwLock;
 
-use crate::core::{config::get_config, error::Errors};
+use crate::core::{config::get_config, error::InternalError};
 
 lazy_static! {
   static ref SERVICE_ACCOUNT_TOKEN: RwLock<Option<(Token, i64)>> = RwLock::new(None);
@@ -38,7 +38,9 @@ pub fn token_api_client() -> impl TokenApi {
   TokenApiClient::new(Arc::new(Configuration::with_client(CLIENT.clone())))
 }
 
-pub async fn create_jwt(claims: HashMap<String, serde_json::Value>) -> Result<String, Errors> {
+pub async fn create_jwt(
+  claims: HashMap<String, serde_json::Value>,
+) -> Result<String, InternalError> {
   let service_account_token = get_service_account_token().await?;
   let jwt_api = jwt_api_client(&service_account_token);
   let jwt = jwt_api

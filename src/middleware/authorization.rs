@@ -4,7 +4,7 @@ use http::request::Parts;
 
 use crate::{
   core::{
-    error::{Errors, INVALID_ERROR, REQUIRED_ERROR},
+    error::{InternalError, INVALID_ERROR, REQUIRED_ERROR},
     openapi::AUTHORIZATION_HEADER,
   },
   router::RouterState,
@@ -22,27 +22,33 @@ where
   RouterState: FromRef<S>,
   S: Send + Sync,
 {
-  type Rejection = Errors;
+  type Rejection = InternalError;
 
   async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
     if let Some(authorization_header_value) = parts.headers.get(AUTHORIZATION_HEADER) {
       let authorization_string = match authorization_header_value.to_str() {
         Ok(authorization_string) => {
           if authorization_string.len() < TOKEN_TYPE_BEARER.len() + 1 {
-            return Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR));
+            return Err(
+              InternalError::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR),
+            );
           }
           &authorization_string[(TOKEN_TYPE_BEARER.len() + 1)..]
         }
         Err(e) => {
           log::error!("invalid authorization header: {}", e);
-          return Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR));
+          return Err(
+            InternalError::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR),
+          );
         }
       };
       let claims_value = match jwt_api_client(authorization_string).jwt_is_valid().await {
         Ok(claims_value) => claims_value,
         Err(e) => {
           log::error!("failed to validate authorization header: {:?}", e);
-          return Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR));
+          return Err(
+            InternalError::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR),
+          );
         }
       };
       let claims = match serde_json::from_value(serde_json::Value::Object(
@@ -51,11 +57,13 @@ where
         Ok(claims) => claims,
         Err(e) => {
           log::error!("failed to parse auth jwt claims response: {:?}", e);
-          return Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR));
+          return Err(
+            InternalError::unauthorized().with_error(AUTHORIZATION_HEADER, INVALID_ERROR),
+          );
         }
       };
       return Ok(Self { claims });
     }
-    Err(Errors::unauthorized().with_error(AUTHORIZATION_HEADER, REQUIRED_ERROR))
+    Err(InternalError::unauthorized().with_error(AUTHORIZATION_HEADER, REQUIRED_ERROR))
   }
 }

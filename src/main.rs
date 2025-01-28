@@ -6,7 +6,7 @@ use object_storage::{
   core::{
     config::{get_config, init_config},
     database::{close_pool, init_pool},
-    error::Errors,
+    error::InternalError,
   },
   router::{create_router, RouterState},
   service::peer::serve_peer,
@@ -23,7 +23,7 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Errors> {
+async fn main() -> Result<(), InternalError> {
   dotenv::dotenv().ok();
   sqlx::any::install_default_drivers();
 
@@ -86,7 +86,7 @@ async fn main() -> Result<(), Errors> {
   Ok(())
 }
 
-async fn serve(router: Router, cancellation_token: CancellationToken) -> Result<(), Errors> {
+async fn serve(router: Router, cancellation_token: CancellationToken) -> Result<(), InternalError> {
   let serve_shutdown_signal = async move {
     cancellation_token.cancelled().await;
   };
@@ -112,7 +112,7 @@ async fn shutdown_signal(cancellation_token: CancellationToken) {
   let ctrl_c = async {
     tokio::signal::ctrl_c()
       .await
-      .map_err(|e| Errors::internal_error().with_application_error(e.to_string()))
+      .map_err(|e| InternalError::internal_error().with_application_error(e.to_string()))
   };
 
   #[cfg(unix)]
@@ -122,7 +122,7 @@ async fn shutdown_signal(cancellation_token: CancellationToken) {
         Some(_) => Ok(()),
         None => Ok(()),
       },
-      Err(e) => Err(Errors::internal_error().with_application_error(e.to_string())),
+      Err(e) => Err(InternalError::internal_error().with_application_error(e.to_string())),
     }
   };
 
