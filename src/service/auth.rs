@@ -1,10 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use auth_client::{
-  apis::{
-    configuration::{ApiKey, Configuration},
-    JwtApi, JwtApiClient, TokenApi, TokenApiClient,
-  },
+  apis::{configuration::Configuration, JwtApi, JwtApiClient, TokenApi, TokenApiClient},
   models::{
     token_request_service_account::GrantType, JwtRequest, Token, TokenRequest,
     TokenRequestServiceAccount,
@@ -27,10 +24,8 @@ lazy_static! {
 
 pub fn jwt_api_client(token: &str) -> impl JwtApi {
   let mut configuration = Configuration::with_client(CLIENT.clone());
-  configuration.api_key = Some(ApiKey {
-    prefix: Some("Bearer".to_owned()),
-    key: token.to_owned(),
-  });
+  configuration.base_path = get_config().auth.uri.to_owned();
+  configuration.oauth_access_token = Some(token.to_owned());
   JwtApiClient::new(Arc::new(configuration))
 }
 

@@ -200,7 +200,7 @@ checksum = "c5201cf250e0a879de5e309744cc5ce2f84b2f0e190c4a617561ccf638099910"
 [[package]]
 name = "auth-client"
 version = "0.1.0"
-source = "git+https://github.com/aicacia/rs-auth.git?rev=b15fbf4#b15fbf4d6a1c9a44379bcf418c4a6c60c59bf289"
+source = "git+https://github.com/aicacia/rs-auth.git?rev=24794e8#24794e817705810f298bf824d3ee138a6994a2b0"
 dependencies = [
  "base64 0.7.0",
  "futures",
@@ -1804,6 +1804,7 @@ dependencies = [
  "futures-util",
  "http 1.2.0",
  "http-body-util",
+ "hyper",
  "hyper-util",
  "lazy_static",
  "log",

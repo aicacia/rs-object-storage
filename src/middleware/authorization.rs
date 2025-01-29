@@ -4,6 +4,7 @@ use http::request::Parts;
 
 use crate::{
   core::{
+    config::get_config,
     error::{InternalError, INVALID_ERROR, REQUIRED_ERROR},
     openapi::AUTHORIZATION_HEADER,
   },
@@ -42,7 +43,10 @@ where
           );
         }
       };
-      let claims_value = match jwt_api_client(authorization_string).jwt_is_valid().await {
+      let claims_value = match jwt_api_client(authorization_string)
+        .jwt_is_valid(&get_config().auth.tenant_client_id.to_string())
+        .await
+      {
         Ok(claims_value) => claims_value,
         Err(e) => {
           log::error!("failed to validate authorization header: {:?}", e);
