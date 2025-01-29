@@ -17,12 +17,13 @@ use webrtc::{
 use webrtc_http::server::RTCListener;
 use webrtc_p2p::{peer::SignalMessage, Peer, PeerOptions};
 
-use crate::core::{config::get_config, error::InternalError};
+use crate::core::{config::Config, error::InternalError};
 
 use super::auth;
 
 pub async fn serve_peer(
   router: axum::Router,
+  config: Arc<Config>,
   cancellation_token: CancellationToken,
 ) -> Result<(), InternalError> {
   let mut m = MediaEngine::default();
@@ -49,7 +50,7 @@ pub async fn serve_peer(
       _ = cancellation_token.cancelled() => {
         break;
       }
-      result = ws_serve_peer(api.clone(), peer_options.clone(), router.clone(), cancellation_token.clone()) => match result {
+      result = ws_serve_peer(config.as_ref(), api.clone(), peer_options.clone(), router.clone(), cancellation_token.clone()) => match result {
         Ok(_) => {
           break;
         }
@@ -64,15 +65,16 @@ pub async fn serve_peer(
 }
 
 async fn ws_serve_peer(
+  config: &Config,
   api: Arc<webrtc::api::API>,
   peer_options: PeerOptions,
   router: axum::Router,
   cancellation_token: CancellationToken,
 ) -> Result<(), InternalError> {
-  let ws_server_token = create_p2p_ws_server_token().await?;
+  let ws_server_token = create_p2p_ws_server_token(config).await?;
   let ws_url = format!(
     "{}/server/websocket?token={}",
-    get_config().p2p.ws_uri,
+    config.p2p.ws_uri,
     urlencoding::encode(&ws_server_token)
   );
   let (ws, _) = connect_async(ws_url).await?;
@@ -199,15 +201,14 @@ lazy_static! {
   static ref AUTH_P2P_TOKEN: RwLock<Option<(String, i64)>> = RwLock::new(None);
 }
 
-async fn create_p2p_ws_server_token() -> Result<String, InternalError> {
-  let config = get_config();
+async fn create_p2p_ws_server_token(config: &Config) -> Result<String, InternalError> {
   let body = ServerAuthenticateRequest {
     id: config.p2p.id.clone(),
     password: config.p2p.password.clone(),
   };
   let p2p_ws_server_token = reqwest::Client::new()
     .post(format!("{}/server", config.p2p.api_uri))
-    .bearer_auth(create_p2p_token().await?)
+    .bearer_auth(create_p2p_token(config).await?)
     .json(&body)
     .send()
     .await?
@@ -216,8 +217,7 @@ async fn create_p2p_ws_server_token() -> Result<String, InternalError> {
   Ok(p2p_ws_server_token)
 }
 
-fn create_p2p_claims() -> (HashMap<String, serde_json::Value>, i64) {
-  let config = get_config();
+fn create_p2p_claims(config: &Config) -> (HashMap<String, serde_json::Value>, i64) {
   let now = chrono::Utc::now().timestamp();
   let expires_seconds = 5 * 60;
   let expires_at = now + expires_seconds;
@@ -230,7 +230,7 @@ fn create_p2p_claims() -> (HashMap<String, serde_json::Value>, i64) {
   (claims, expires_at)
 }
 
-async fn create_p2p_token() -> Result<String, InternalError> {
+async fn create_p2p_token(config: &Config) -> Result<String, InternalError> {
   let now = chrono::Utc::now().timestamp();
   if let Some((token, expires_at)) = AUTH_P2P_TOKEN.read().await.as_ref() {
     if now < *expires_at {
@@ -239,8 +239,8 @@ async fn create_p2p_token() -> Result<String, InternalError> {
   }
   let mut auth_p2p_token = AUTH_P2P_TOKEN.write().await;
 
-  let (claims, expires_at) = create_p2p_claims();
-  let token = auth::create_jwt(claims).await?;
+  let (claims, expires_at) = create_p2p_claims(config);
+  let token = auth::create_jwt(config, claims).await?;
 
   auth_p2p_token.replace((token.clone(), expires_at));
 

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use utoipa::{
   openapi::{
     security::{HttpAuthScheme, HttpBuilder, SecurityScheme},
@@ -6,7 +8,7 @@ use utoipa::{
   Modify,
 };
 
-use super::config::get_config;
+use super::config::Config;
 
 pub const AUTHORIZATION_HEADER: &str = "Authorization";
 
@@ -27,14 +29,21 @@ impl Modify for SecurityAddon {
   }
 }
 
-pub struct ServersAddon;
+pub struct ServersAddon {
+  config: Arc<Config>,
+}
+
+impl ServersAddon {
+  pub fn new(config: Arc<Config>) -> Self {
+    Self { config }
+  }
+}
 
 impl Modify for ServersAddon {
   fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-    let config = get_config();
     openapi
       .servers
       .get_or_insert(Vec::default())
-      .push(Server::new(config.server.url.clone()));
+      .push(Server::new(self.config.server.url.clone()));
   }
 }

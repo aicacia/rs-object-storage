@@ -1,10 +1,7 @@
 use std::usize;
 
 use crate::{
-  core::{
-    config::get_config,
-    error::{InternalError, INTERNAL_ERROR, INVALID_ERROR, NOT_FOUND_ERROR, REQUEST_BODY},
-  },
+  core::error::{InternalError, INTERNAL_ERROR, INVALID_ERROR, NOT_FOUND_ERROR, REQUEST_BODY},
   middleware::{authorization::Authorization, json::Json},
   model::{
     object::{
@@ -191,8 +188,7 @@ pub async fn read_object_by_id(
     }
   };
 
-  let config = get_config();
-  let objects_path = std::path::Path::new(&config.objects_dir);
+  let objects_path = std::path::Path::new(&state.config.objects_dir);
   let object_path = objects_path.join(object_row.id.to_string());
   let object = match fs::OpenOptions::new()
     .create(false)
@@ -260,8 +256,7 @@ pub async fn read_object_by_path(
     }
   };
 
-  let config = get_config();
-  let objects_path = std::path::Path::new(&config.objects_dir);
+  let objects_path = std::path::Path::new(&state.config.objects_dir);
   let object_path = objects_path.join(object_row.id.to_string());
   let object = match fs::OpenOptions::new()
     .create(false)
@@ -311,15 +306,18 @@ pub async fn create_object(
   Authorization { .. }: Authorization,
   Json(body): Json<CreateObjectRequest>,
 ) -> impl IntoResponse {
-  let object_row = match service::object::create_object(&state.pool, body.path, body.kind).await {
-    Ok(object_row) => object_row,
-    Err(err) => {
-      log::error!("Error creating object in database: {}", err);
-      return InternalError::internal_error()
-        .with_application_error(INTERNAL_ERROR)
-        .into_response();
-    }
-  };
+  let object_row =
+    match service::object::create_object(&state.pool, state.config.clone(), body.path, body.kind)
+      .await
+    {
+      Ok(object_row) => object_row,
+      Err(err) => {
+        log::error!("Error creating object in database: {}", err);
+        return InternalError::internal_error()
+          .with_application_error(INTERNAL_ERROR)
+          .into_response();
+      }
+    };
 
   (StatusCode::CREATED, axum::Json(Object::from(object_row))).into_response()
 }
@@ -361,8 +359,7 @@ pub async fn append_object(
         .into_response();
     }
   };
-  let config = get_config();
-  let objects_path = std::path::Path::new(&config.objects_dir);
+  let objects_path = std::path::Path::new(&state.config.objects_dir);
   let object_path = objects_path.join(object_row.id.to_string());
   let mut object = match fs::OpenOptions::new()
     .create(false)
@@ -485,7 +482,7 @@ pub async fn delete_object(
   Authorization { .. }: Authorization,
   Path(object_id): Path<i64>,
 ) -> impl IntoResponse {
-  match service::object::delete_object(&state.pool, object_id).await {
+  match service::object::delete_object(&state.pool, state.config.clone(), object_id).await {
     Ok(Some(_)) => {}
     Ok(None) => {
       log::error!("Object not found: {}", object_id);

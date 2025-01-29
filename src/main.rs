@@ -1,10 +1,10 @@
-use std::{net::SocketAddr, str::FromStr};
+use std::{net::SocketAddr, str::FromStr, sync::Arc};
 
 use axum::Router;
 use clap::Parser;
 use object_storage::{
   core::{
-    config::{get_config, init_config},
+    config::Config,
     database::{close_pool, init_pool},
     error::InternalError,
   },
@@ -29,7 +29,7 @@ async fn main() -> Result<(), InternalError> {
 
   let args = Args::parse();
 
-  let config = init_config(&args.config).await?;
+  let config = Arc::new(Config::new(&args.config).await?);
 
   create_dir_all(&config.objects_dir).await?;
 
@@ -48,14 +48,25 @@ async fn main() -> Result<(), InternalError> {
     .with(tracing_subscriber::fmt::layer())
     .init();
 
-  let pool = init_pool().await?;
+  let pool = init_pool(config.as_ref()).await?;
 
   let cancellation_token = CancellationToken::new();
 
-  let router = create_router(RouterState { pool: pool.clone() });
-  let serve_handle = tokio::spawn(serve(router.clone(), cancellation_token.clone()));
+  let router = create_router(RouterState {
+    config: config.clone(),
+    pool: pool.clone(),
+  });
+  let serve_handle = tokio::spawn(serve(
+    router.clone(),
+    config.clone(),
+    cancellation_token.clone(),
+  ));
   let serve_peer_handle = if config.p2p.enabled {
-    Some(tokio::spawn(serve_peer(router, cancellation_token.clone())))
+    Some(tokio::spawn(serve_peer(
+      router,
+      config.clone(),
+      cancellation_token.clone(),
+    )))
   } else {
     None
   };
@@ -86,11 +97,14 @@ async fn main() -> Result<(), InternalError> {
   Ok(())
 }
 
-async fn serve(router: Router, cancellation_token: CancellationToken) -> Result<(), InternalError> {
+async fn serve(
+  router: Router,
+  config: Arc<Config>,
+  cancellation_token: CancellationToken,
+) -> Result<(), InternalError> {
   let serve_shutdown_signal = async move {
     cancellation_token.cancelled().await;
   };
-  let config = get_config();
 
   let listener = tokio::net::TcpListener::bind(&SocketAddr::from((
     config.server.address,

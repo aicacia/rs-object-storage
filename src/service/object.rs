@@ -1,21 +1,22 @@
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use axum::body::Bytes;
 use tokio::{fs, io::AsyncWriteExt};
 
 use crate::{
-  core::{config::get_config, database::run_transaction},
+  core::{config::Config, database::run_transaction},
   repository::{self, object::ObjectRow},
 };
 
 pub async fn create_object(
   pool: &sqlx::AnyPool,
+  config: Arc<Config>,
   path: String,
   kind: Option<String>,
 ) -> sqlx::Result<ObjectRow> {
   run_transaction(pool, |transaction| {
-    Box::pin(async {
-      let config = get_config();
+    let config = config.clone();
+    Box::pin(async move {
       let objects_path = Path::new(&config.objects_dir);
 
       let object_row = repository::object::create_object(transaction, path, kind, 0).await?;
@@ -43,11 +44,12 @@ pub async fn append_object(
 
 pub async fn delete_object(
   pool: &sqlx::AnyPool,
+  config: Arc<Config>,
   object_id: i64,
 ) -> sqlx::Result<Option<ObjectRow>> {
   run_transaction(pool, move |transaction| {
+    let config = config.clone();
     Box::pin(async move {
-      let config = get_config();
       let objects_path = Path::new(&config.objects_dir);
       let object_path = objects_path.join(object_id.to_string());
       let object_row = repository::object::delete_object(transaction, object_id).await?;

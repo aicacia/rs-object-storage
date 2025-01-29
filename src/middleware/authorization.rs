@@ -4,7 +4,6 @@ use http::request::Parts;
 
 use crate::{
   core::{
-    config::get_config,
     error::{InternalError, INVALID_ERROR, REQUIRED_ERROR},
     openapi::AUTHORIZATION_HEADER,
   },
@@ -26,6 +25,8 @@ where
   type Rejection = InternalError;
 
   async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+    let state = RouterState::from_ref(_state);
+
     if let Some(authorization_header_value) = parts.headers.get(AUTHORIZATION_HEADER) {
       let authorization_string = match authorization_header_value.to_str() {
         Ok(authorization_string) => {
@@ -43,8 +44,8 @@ where
           );
         }
       };
-      let claims_value = match jwt_api_client(authorization_string)
-        .jwt_is_valid(&get_config().auth.tenant_client_id.to_string())
+      let claims_value = match jwt_api_client(&state.config, authorization_string)
+        .jwt_is_valid(&state.config.auth.tenant_client_id.to_string())
         .await
       {
         Ok(claims_value) => claims_value,

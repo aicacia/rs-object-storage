@@ -74,7 +74,7 @@ impl<C: Connect> Configuration<C>
     /// ```
     pub fn with_client(client: Client<C, String>) -> Configuration<C> {
         Configuration {
-            base_path: "http://localhost:3000".to_owned(),
+            base_path: "http://localhost".to_owned(),
             user_agent: Some("OpenAPI-Generator/0.1.0/rust".to_owned()),
             client,
             basic_auth: None,

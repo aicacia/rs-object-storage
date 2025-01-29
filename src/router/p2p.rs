@@ -1,6 +1,6 @@
 use crate::{core::error::Errors, middleware::authorization::Authorization, model::p2p::P2P};
 
-use axum::response::IntoResponse;
+use axum::{extract::State, response::IntoResponse};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::RouterState;
@@ -21,8 +21,11 @@ pub const P2P_TAG: &str = "p2p";
     ("Authorization" = [])
   )
 )]
-pub async fn p2p(Authorization { .. }: Authorization) -> impl IntoResponse {
-  axum::Json(P2P::default()).into_response()
+pub async fn p2p(
+  State(state): State<RouterState>,
+  Authorization { .. }: Authorization,
+) -> impl IntoResponse {
+  axum::Json(P2P::new(&state.config)).into_response()
 }
 
 pub fn create_router(state: RouterState) -> OpenApiRouter {

@@ -14,7 +14,7 @@ use hyper_util::{
 use serde::Deserialize;
 use tokio::sync::RwLock;
 
-use crate::core::{config::get_config, error::InternalError};
+use crate::core::{config::Config, error::InternalError};
 
 lazy_static! {
   static ref SERVICE_ACCOUNT_TOKEN: RwLock<Option<(Token, i64)>> = RwLock::new(None);
@@ -22,9 +22,9 @@ lazy_static! {
     Client::builder(TokioExecutor::new()).build_http();
 }
 
-pub fn jwt_api_client(token: &str) -> impl JwtApi {
+pub fn jwt_api_client(config: &Config, token: &str) -> impl JwtApi {
   let mut configuration = Configuration::with_client(CLIENT.clone());
-  configuration.base_path = get_config().auth.uri.to_owned();
+  configuration.base_path = config.auth.uri.to_owned();
   configuration.oauth_access_token = Some(token.to_owned());
   JwtApiClient::new(Arc::new(configuration))
 }
@@ -34,20 +34,23 @@ pub fn token_api_client() -> impl TokenApi {
 }
 
 pub async fn create_jwt(
+  config: &Config,
   claims: HashMap<String, serde_json::Value>,
 ) -> Result<String, InternalError> {
-  let service_account_token = get_service_account_token().await?;
-  let jwt_api = jwt_api_client(&service_account_token);
+  let service_account_token = get_service_account_token(config).await?;
+  let jwt_api = jwt_api_client(config, &service_account_token);
   let jwt = jwt_api
     .create_jwt(JwtRequest {
-      tenant_id: get_config().p2p.tenant_id,
+      tenant_id: config.p2p.tenant_id,
       claims,
     })
     .await?;
   Ok(jwt)
 }
 
-pub async fn get_service_account_token() -> Result<String, auth_client::apis::Error> {
+pub async fn get_service_account_token(
+  config: &Config,
+) -> Result<String, auth_client::apis::Error> {
   let now = chrono::Utc::now().timestamp();
   if let Some((token, iss_at)) = SERVICE_ACCOUNT_TOKEN.read().await.as_ref() {
     if now < iss_at + token.expires_in {
@@ -56,7 +59,7 @@ pub async fn get_service_account_token() -> Result<String, auth_client::apis::Er
   }
   let mut service_account_token = SERVICE_ACCOUNT_TOKEN.write().await;
 
-  let token = create_service_account_token().await?;
+  let token = create_service_account_token(config).await?;
   let access_token = token.access_token.clone();
 
   service_account_token.replace((token, now));
@@ -64,8 +67,7 @@ pub async fn get_service_account_token() -> Result<String, auth_client::apis::Er
   Ok(access_token)
 }
 
-async fn create_service_account_token() -> Result<Token, auth_client::apis::Error> {
-  let config = get_config();
+async fn create_service_account_token(config: &Config) -> Result<Token, auth_client::apis::Error> {
   let token_request = TokenRequest::TokenRequestServiceAccount(TokenRequestServiceAccount {
     grant_type: GrantType::ServiceAccount,
     client_id: config.auth.service_account.client_id,
