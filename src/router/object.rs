@@ -1,7 +1,9 @@
 use std::usize;
 
 use crate::{
-  core::error::{InternalError, INTERNAL_ERROR, INVALID_ERROR, NOT_FOUND_ERROR, REQUEST_BODY},
+  core::error::{
+    Errors, InternalError, INTERNAL_ERROR, INVALID_ERROR, NOT_FOUND_ERROR, REQUEST_BODY,
+  },
   middleware::{authorization::Authorization, json::Json},
   model::{
     object::{
@@ -36,8 +38,8 @@ pub const OBJECT_TAG: &str = "object";
   ),
   responses(
     (status = 200, content_type = "application/json", body = Pagination<Object>),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -82,9 +84,9 @@ pub async fn get_objects(
   ),
   responses(
     (status = 200, content_type = "application/json", body = Object),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 404, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -121,9 +123,9 @@ pub async fn get_object_by_path(
   tags = [OBJECT_TAG],
   responses(
     (status = 200, content_type = "application/json", body = Object),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 404, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -159,9 +161,9 @@ pub async fn get_object_by_id(
   tags = [OBJECT_TAG],
   responses(
     (status = 200, content_type = "*/*"),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 404, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -227,9 +229,9 @@ pub async fn read_object_by_id(
   ),
   responses(
     (status = 200, content_type = "*/*"),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 404, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -293,9 +295,9 @@ pub async fn read_object_by_path(
   request_body = CreateObjectRequest,
   responses(
     (status = 201, content_type = "application/json", body = Object),
-    (status = 400, content_type = "application/json", body = InternalError),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 400, content_type = "application/json", body = Errors),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -329,10 +331,10 @@ pub async fn create_object(
   request_body(content = UploadPartRequest, content_type = "multipart/form-data"),
   responses(
     (status = 200, content_type = "application/json", body = usize),
-    (status = 400, content_type = "application/json", body = InternalError),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 404, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 400, content_type = "application/json", body = Errors),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -422,10 +424,10 @@ pub async fn append_object(
   request_body = MoveObjectRequest,
   responses(
     (status = 200, content_type = "application/json", body = Object),
-    (status = 400, content_type = "application/json", body = InternalError),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 404, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 400, content_type = "application/json", body = Errors),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])
@@ -468,10 +470,10 @@ pub async fn move_object(
   tags = [OBJECT_TAG],
   responses(
     (status = 204),
-    (status = 400, content_type = "application/json", body = InternalError),
-    (status = 401, content_type = "application/json", body = InternalError),
-    (status = 404, content_type = "application/json", body = InternalError),
-    (status = 500, content_type = "application/json", body = InternalError),
+    (status = 400, content_type = "application/json", body = Errors),
+    (status = 401, content_type = "application/json", body = Errors),
+    (status = 404, content_type = "application/json", body = Errors),
+    (status = 500, content_type = "application/json", body = Errors),
   ),
   security(
     ("Authorization" = [])

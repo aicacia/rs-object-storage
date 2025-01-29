@@ -46,7 +46,6 @@ Class | Method | HTTP request | Description
  - [CreateObjectRequest](docs/CreateObjectRequest.md)
  - [ErrorMessage](docs/ErrorMessage.md)
  - [Health](docs/Health.md)
- - [InternalError](docs/InternalError.md)
  - [MoveObjectRequest](docs/MoveObjectRequest.md)
  - [P2P](docs/P2P.md)
  - [Version](docs/Version.md)

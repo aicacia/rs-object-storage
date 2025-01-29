@@ -4,8 +4,6 @@ pub mod error_message;
 pub use self::error_message::ErrorMessage;
 pub mod health;
 pub use self::health::Health;
-pub mod internal_error;
-pub use self::internal_error::InternalError;
 pub mod move_object_request;
 pub use self::move_object_request::MoveObjectRequest;
 pub mod p2_p;
