@@ -42,7 +42,7 @@ pub trait ObjectApi: Send + Sync {
     fn delete_object(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
     fn get_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
     fn get_object_by_path(&self, path: &str) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
-    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<models::PaginationObjectInstance, Error>> + Send>>;
+    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<models::Pagination, Error>> + Send>>;
     fn move_object(&self, object_id: i64, move_object_request: models::MoveObjectRequest) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
     fn read_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
     fn read_object_by_path(&self, path: &str) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
@@ -98,7 +98,7 @@ impl<C: Connect>ObjectApi for ObjectApiClient<C>
     }
 
     #[allow(unused_mut)]
-    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<models::PaginationObjectInstance, Error>> + Send>> {
+    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<models::Pagination, Error>> + Send>> {
         let mut req = __internal_request::Request::new(hyper::Method::GET, "/objects".to_string())
         ;
         if let Some(ref s) = offset {

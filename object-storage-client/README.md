@@ -49,8 +49,7 @@ Class | Method | HTTP request | Description
  - [MoveObjectRequest](docs/MoveObjectRequest.md)
  - [ObjectInstance](docs/ObjectInstance.md)
  - [P2P](docs/P2P.md)
- - [PaginationObjectInstance](docs/PaginationObjectInstance.md)
- - [PaginationObjectInstanceItemsInner](docs/PaginationObjectInstanceItemsInner.md)
+ - [Pagination](docs/Pagination.md)
  - [Version](docs/Version.md)
 
 

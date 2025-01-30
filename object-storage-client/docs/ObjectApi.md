@@ -159,7 +159,7 @@ Name | Type | Description  | Required | Notes
 
 ## get_objects
 
-> models::PaginationObjectInstance get_objects(offset, limit, path)
+> models::Pagination get_objects(offset, limit, path)
 
 
 ### Parameters
@@ -173,7 +173,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginationObjectInstance**](Pagination_ObjectInstance.md)
+[**models::Pagination**](Pagination.md)
 
 ### Authorization
 

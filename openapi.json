@@ -64,9 +64,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pagination_ObjectInstance"
-                }
+                "schema": { "$ref": "#/components/schemas/Pagination" }
               }
             }
           },
@@ -636,25 +634,14 @@
           "ws_uri": { "type": "string" }
         }
       },
-      "Pagination_ObjectInstance": {
+      "Pagination": {
         "type": "object",
         "required": ["has_more", "items"],
         "properties": {
           "has_more": { "type": "boolean" },
           "items": {
             "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["id", "path", "size", "updated_at", "created_at"],
-              "properties": {
-                "created_at": { "type": "string", "format": "date-time" },
-                "id": { "type": "integer", "format": "int64" },
-                "path": { "type": "string" },
-                "size": { "type": "integer", "format": "int64", "minimum": 0 },
-                "type": { "type": ["string", "null"] },
-                "updated_at": { "type": "string", "format": "date-time" }
-              }
-            }
+            "items": { "$ref": "#/components/schemas/ObjectInstance" }
           }
         }
       },

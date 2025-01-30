@@ -7,8 +7,8 @@ use crate::{
   middleware::{authorization::Authorization, json::Json},
   model::{
     object::{
-      CreateObjectRequest, MoveObjectRequest, ObjectInstance, ObjectQuery, ObjectsQuery,
-      UploadPartRequest,
+      CreateObjectRequest, MoveObjectRequest, ObjectInstance, ObjectInstancePagination,
+      ObjectQuery, ObjectsQuery, UploadPartRequest,
     },
     util::{OffsetAndLimit, Pagination},
   },
@@ -38,7 +38,7 @@ pub const OBJECT_TAG: &str = "object";
     ObjectsQuery,
   ),
   responses(
-    (status = 200, content_type = "application/json", body = Pagination<ObjectInstance>),
+    (status = 200, content_type = "application/json", body = ObjectInstancePagination),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 500, content_type = "application/json", body = Errors),
   ),
@@ -208,7 +208,7 @@ pub async fn read_object_by_id(
     }
   };
   let content_type = object_row
-    .kind
+    .r#type
     .unwrap_or_else(|| "application/octet-stream".to_owned());
   let content_disposition = format!("attachment; objectname={:?}", object_row.path);
   (
@@ -276,7 +276,7 @@ pub async fn read_object_by_path(
     }
   };
   let content_type = object_row
-    .kind
+    .r#type
     .unwrap_or_else(|| "application/octet-stream".to_owned());
   let content_disposition = format!("attachment; objectname={:?}", object_row.path);
   (
@@ -310,7 +310,7 @@ pub async fn create_object(
   Json(body): Json<CreateObjectRequest>,
 ) -> impl IntoResponse {
   let object_row =
-    match service::object::create_object(&state.pool, state.config.clone(), body.path, body.kind)
+    match service::object::create_object(&state.pool, state.config.clone(), body.path, body.r#type)
       .await
     {
       Ok(object_row) => object_row,
@@ -444,28 +444,24 @@ pub async fn move_object(
   Path(object_id): Path<i64>,
   Json(body): Json<MoveObjectRequest>,
 ) -> impl IntoResponse {
-  let object_row = match repository::object::update_object_path(
-    &state.pool,
-    object_id,
-    body.path,
-    body.kind,
-  )
-  .await
-  {
-    Ok(Some(object)) => object,
-    Ok(None) => {
-      log::error!("ObjectInstance not found: {}", object_id);
-      return InternalError::not_found()
-        .with_error("object_id", NOT_FOUND_ERROR)
-        .into_response();
-    }
-    Err(err) => {
-      log::error!("Error getting objects from database: {}", err);
-      return InternalError::internal_error()
-        .with_application_error(INTERNAL_ERROR)
-        .into_response();
-    }
-  };
+  let object_row =
+    match repository::object::update_object_path(&state.pool, object_id, body.path, body.r#type)
+      .await
+    {
+      Ok(Some(object)) => object,
+      Ok(None) => {
+        log::error!("ObjectInstance not found: {}", object_id);
+        return InternalError::not_found()
+          .with_error("object_id", NOT_FOUND_ERROR)
+          .into_response();
+      }
+      Err(err) => {
+        log::error!("Error getting objects from database: {}", err);
+        return InternalError::internal_error()
+          .with_application_error(INTERNAL_ERROR)
+          .into_response();
+      }
+    };
   axum::Json(ObjectInstance::from(object_row)).into_response()
 }
 

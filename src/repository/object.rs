@@ -4,8 +4,7 @@ use std::collections::HashMap;
 pub struct ObjectRow {
   pub id: i64,
   pub path: String,
-  #[sqlx(rename = "type")]
-  pub kind: Option<String>,
+  pub r#type: Option<String>,
   pub size: i64,
   pub updated_at: i64,
   pub created_at: i64,
@@ -73,7 +72,7 @@ pub async fn get_objects_and_folders(
       .or_insert_with(|| ObjectRow {
         id: 0,
         path: object_folder,
-        kind: Some("directory".to_owned()),
+        r#type: Some("directory".to_owned()),
         size: 0,
         updated_at: 0,
         created_at: 0,

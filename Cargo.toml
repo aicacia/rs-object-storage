@@ -104,7 +104,7 @@ chrono = { version = "0.4", default-features = false, features = ["serde"] }
 uuid = { version = "1.11", features = ["serde", "v4"] }
 atomicoption = "0.1"
 
-auth-client = { git = "https://github.com/aicacia/rs-auth.git", rev = "24794e8" }
+auth-client = { git = "https://github.com/aicacia/rs-auth.git", rev = "f1cf4cb" }
 
 # peer server deps
 webrtc-http = { version = "0.1", features = ["axum"] }

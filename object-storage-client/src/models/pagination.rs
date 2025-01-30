@@ -12,16 +12,16 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct PaginationObjectInstance {
+pub struct Pagination {
     #[serde(rename = "has_more")]
     pub has_more: bool,
     #[serde(rename = "items")]
-    pub items: Vec<models::PaginationObjectInstanceItemsInner>,
+    pub items: Vec<models::ObjectInstance>,
 }
 
-impl PaginationObjectInstance {
-    pub fn new(has_more: bool, items: Vec<models::PaginationObjectInstanceItemsInner>) -> PaginationObjectInstance {
-        PaginationObjectInstance {
+impl Pagination {
+    pub fn new(has_more: bool, items: Vec<models::ObjectInstance>) -> Pagination {
+        Pagination {
             has_more,
             items,
         }

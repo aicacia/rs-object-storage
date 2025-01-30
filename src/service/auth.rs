@@ -78,16 +78,14 @@ async fn create_service_account_token(config: &Config) -> Result<Token, auth_cli
 
 #[derive(Debug, Deserialize, Default, Clone)]
 pub struct Claims {
-  #[serde(rename = "type")]
-  pub kind: String,
+  pub r#type: String,
   pub exp: i64,
   pub iat: i64,
   pub nbf: i64,
   pub iss: String,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub aud: Option<String>,
-  #[serde(rename = "sub_type")]
-  pub sub_kind: String,
+  pub sub_type: String,
   pub sub: i64,
   pub app: i64,
   pub scopes: Vec<String>,
