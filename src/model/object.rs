@@ -36,8 +36,8 @@ pub struct MoveObjectRequest {
   pub kind: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
-pub struct Object {
+#[derive(Serialize, ToSchema)]
+pub struct ObjectInstance {
   pub id: i64,
   pub path: String,
   #[serde(rename = "type")]
@@ -47,7 +47,7 @@ pub struct Object {
   pub created_at: DateTime<Utc>,
 }
 
-impl From<ObjectRow> for Object {
+impl From<ObjectRow> for ObjectInstance {
   fn from(row: ObjectRow) -> Self {
     Self {
       id: row.id,

@@ -38,12 +38,12 @@ impl<C: Connect> ObjectApiClient<C>
 
 pub trait ObjectApi: Send + Sync {
     fn append_object(&self, object_id: i64, part: std::path::PathBuf) -> Pin<Box<dyn Future<Output = Result<i32, Error>> + Send>>;
-    fn create_object(&self, create_object_request: models::CreateObjectRequest) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>>;
+    fn create_object(&self, create_object_request: models::CreateObjectRequest) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
     fn delete_object(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
-    fn get_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>>;
-    fn get_object_by_path(&self, path: &str) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>>;
-    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>>;
-    fn move_object(&self, object_id: i64, move_object_request: models::MoveObjectRequest) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>>;
+    fn get_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
+    fn get_object_by_path(&self, path: &str) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
+    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<models::PaginationObjectInstance, Error>> + Send>>;
+    fn move_object(&self, object_id: i64, move_object_request: models::MoveObjectRequest) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
     fn read_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
     fn read_object_by_path(&self, path: &str) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
 }
@@ -61,7 +61,7 @@ impl<C: Connect>ObjectApi for ObjectApiClient<C>
     }
 
     #[allow(unused_mut)]
-    fn create_object(&self, create_object_request: models::CreateObjectRequest) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>> {
+    fn create_object(&self, create_object_request: models::CreateObjectRequest) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>> {
         let mut req = __internal_request::Request::new(hyper::Method::POST, "/objects".to_string())
         ;
         req = req.with_body_param(create_object_request);
@@ -80,7 +80,7 @@ impl<C: Connect>ObjectApi for ObjectApiClient<C>
     }
 
     #[allow(unused_mut)]
-    fn get_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>> {
+    fn get_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>> {
         let mut req = __internal_request::Request::new(hyper::Method::GET, "/objects/{object_id}".to_string())
         ;
         req = req.with_path_param("object_id".to_string(), object_id.to_string());
@@ -89,7 +89,7 @@ impl<C: Connect>ObjectApi for ObjectApiClient<C>
     }
 
     #[allow(unused_mut)]
-    fn get_object_by_path(&self, path: &str) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>> {
+    fn get_object_by_path(&self, path: &str) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>> {
         let mut req = __internal_request::Request::new(hyper::Method::GET, "/objects/by-path".to_string())
         ;
         req = req.with_query_param("path".to_string(), path.to_string());
@@ -98,7 +98,7 @@ impl<C: Connect>ObjectApi for ObjectApiClient<C>
     }
 
     #[allow(unused_mut)]
-    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>> {
+    fn get_objects(&self, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Pin<Box<dyn Future<Output = Result<models::PaginationObjectInstance, Error>> + Send>> {
         let mut req = __internal_request::Request::new(hyper::Method::GET, "/objects".to_string())
         ;
         if let Some(ref s) = offset {
@@ -118,7 +118,7 @@ impl<C: Connect>ObjectApi for ObjectApiClient<C>
     }
 
     #[allow(unused_mut)]
-    fn move_object(&self, object_id: i64, move_object_request: models::MoveObjectRequest) -> Pin<Box<dyn Future<Output = Result<serde_json::Value, Error>> + Send>> {
+    fn move_object(&self, object_id: i64, move_object_request: models::MoveObjectRequest) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>> {
         let mut req = __internal_request::Request::new(hyper::Method::PUT, "/objects/{object_id}/move".to_string())
         ;
         req = req.with_path_param("object_id".to_string(), object_id.to_string());

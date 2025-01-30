@@ -47,7 +47,10 @@ Class | Method | HTTP request | Description
  - [ErrorMessage](docs/ErrorMessage.md)
  - [Health](docs/Health.md)
  - [MoveObjectRequest](docs/MoveObjectRequest.md)
+ - [ObjectInstance](docs/ObjectInstance.md)
  - [P2P](docs/P2P.md)
+ - [PaginationObjectInstance](docs/PaginationObjectInstance.md)
+ - [PaginationObjectInstanceItemsInner](docs/PaginationObjectInstanceItemsInner.md)
  - [Version](docs/Version.md)
 
 

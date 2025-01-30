@@ -63,7 +63,11 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "type": "object" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pagination_ObjectInstance"
+                }
+              }
             }
           },
           "401": {
@@ -100,7 +104,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "type": "object" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+              }
             }
           },
           "400": {
@@ -147,7 +153,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "type": "object" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+              }
             }
           },
           "401": {
@@ -236,7 +244,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "type": "object" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+              }
             }
           },
           "401": {
@@ -404,7 +414,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "type": "object" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+              }
             }
           },
           "400": {
@@ -593,6 +605,18 @@
           "type": { "type": ["string", "null"] }
         }
       },
+      "ObjectInstance": {
+        "type": "object",
+        "required": ["id", "path", "size", "updated_at", "created_at"],
+        "properties": {
+          "created_at": { "type": "string", "format": "date-time" },
+          "id": { "type": "integer", "format": "int64" },
+          "path": { "type": "string" },
+          "size": { "type": "integer", "format": "int64", "minimum": 0 },
+          "type": { "type": ["string", "null"] },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
       "P2P": {
         "type": "object",
         "required": [
@@ -610,6 +634,28 @@
           "password": { "type": "string" },
           "tenant_id": { "type": "integer", "format": "int64" },
           "ws_uri": { "type": "string" }
+        }
+      },
+      "Pagination_ObjectInstance": {
+        "type": "object",
+        "required": ["has_more", "items"],
+        "properties": {
+          "has_more": { "type": "boolean" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "path", "size", "updated_at", "created_at"],
+              "properties": {
+                "created_at": { "type": "string", "format": "date-time" },
+                "id": { "type": "integer", "format": "int64" },
+                "path": { "type": "string" },
+                "size": { "type": "integer", "format": "int64", "minimum": 0 },
+                "type": { "type": ["string", "null"] },
+                "updated_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
         }
       },
       "UploadPartRequest": {

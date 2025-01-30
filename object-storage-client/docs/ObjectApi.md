@@ -47,7 +47,7 @@ Name | Type | Description  | Required | Notes
 
 ## create_object
 
-> serde_json::Value create_object(create_object_request)
+> models::ObjectInstance create_object(create_object_request)
 
 
 ### Parameters
@@ -59,7 +59,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**serde_json::Value**](serde_json::Value.md)
+[**models::ObjectInstance**](ObjectInstance.md)
 
 ### Authorization
 
@@ -103,7 +103,7 @@ Name | Type | Description  | Required | Notes
 
 ## get_object_by_id
 
-> serde_json::Value get_object_by_id(object_id)
+> models::ObjectInstance get_object_by_id(object_id)
 
 
 ### Parameters
@@ -115,7 +115,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**serde_json::Value**](serde_json::Value.md)
+[**models::ObjectInstance**](ObjectInstance.md)
 
 ### Authorization
 
@@ -131,7 +131,7 @@ Name | Type | Description  | Required | Notes
 
 ## get_object_by_path
 
-> serde_json::Value get_object_by_path(path)
+> models::ObjectInstance get_object_by_path(path)
 
 
 ### Parameters
@@ -143,7 +143,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**serde_json::Value**](serde_json::Value.md)
+[**models::ObjectInstance**](ObjectInstance.md)
 
 ### Authorization
 
@@ -159,7 +159,7 @@ Name | Type | Description  | Required | Notes
 
 ## get_objects
 
-> serde_json::Value get_objects(offset, limit, path)
+> models::PaginationObjectInstance get_objects(offset, limit, path)
 
 
 ### Parameters
@@ -173,7 +173,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**serde_json::Value**](serde_json::Value.md)
+[**models::PaginationObjectInstance**](Pagination_ObjectInstance.md)
 
 ### Authorization
 
@@ -189,7 +189,7 @@ Name | Type | Description  | Required | Notes
 
 ## move_object
 
-> serde_json::Value move_object(object_id, move_object_request)
+> models::ObjectInstance move_object(object_id, move_object_request)
 
 
 ### Parameters
@@ -202,7 +202,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**serde_json::Value**](serde_json::Value.md)
+[**models::ObjectInstance**](ObjectInstance.md)
 
 ### Authorization
 

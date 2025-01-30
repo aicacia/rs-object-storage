@@ -7,7 +7,8 @@ use crate::{
   middleware::{authorization::Authorization, json::Json},
   model::{
     object::{
-      CreateObjectRequest, MoveObjectRequest, Object, ObjectQuery, ObjectsQuery, UploadPartRequest,
+      CreateObjectRequest, MoveObjectRequest, ObjectInstance, ObjectQuery, ObjectsQuery,
+      UploadPartRequest,
     },
     util::{OffsetAndLimit, Pagination},
   },
@@ -37,7 +38,7 @@ pub const OBJECT_TAG: &str = "object";
     ObjectsQuery,
   ),
   responses(
-    (status = 200, content_type = "application/json", body = Pagination<Object>),
+    (status = 200, content_type = "application/json", body = Pagination<ObjectInstance>),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 500, content_type = "application/json", body = Errors),
   ),
@@ -70,7 +71,7 @@ pub async fn get_objects(
 
   axum::Json(Pagination {
     has_more: objects.len() == offset_and_limit_query.limit.unwrap_or(usize::MAX),
-    items: objects.into_iter().map(Object::from).collect(),
+    items: objects.into_iter().map(ObjectInstance::from).collect(),
   })
   .into_response()
 }
@@ -83,7 +84,7 @@ pub async fn get_objects(
     ObjectQuery,
   ),
   responses(
-    (status = 200, content_type = "application/json", body = Object),
+    (status = 200, content_type = "application/json", body = ObjectInstance),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 404, content_type = "application/json", body = Errors),
     (status = 500, content_type = "application/json", body = Errors),
@@ -101,7 +102,7 @@ pub async fn get_object_by_path(
     match repository::object::get_object_by_path(&state.pool, &object_query.path).await {
       Ok(Some(object_row)) => object_row,
       Ok(None) => {
-        log::error!("Object not found: {}", object_query.path);
+        log::error!("ObjectInstance not found: {}", object_query.path);
         return InternalError::not_found()
           .with_error("path", NOT_FOUND_ERROR)
           .into_response();
@@ -114,7 +115,7 @@ pub async fn get_object_by_path(
       }
     };
 
-  axum::Json(Object::from(object_row)).into_response()
+  axum::Json(ObjectInstance::from(object_row)).into_response()
 }
 
 #[utoipa::path(
@@ -122,7 +123,7 @@ pub async fn get_object_by_path(
   path = "/objects/{object_id}",
   tags = [OBJECT_TAG],
   responses(
-    (status = 200, content_type = "application/json", body = Object),
+    (status = 200, content_type = "application/json", body = ObjectInstance),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 404, content_type = "application/json", body = Errors),
     (status = 500, content_type = "application/json", body = Errors),
@@ -139,7 +140,7 @@ pub async fn get_object_by_id(
   let object_row = match repository::object::get_object_by_id(&state.pool, object_id).await {
     Ok(Some(object_row)) => object_row,
     Ok(None) => {
-      log::error!("Object not found: {}", object_id);
+      log::error!("ObjectInstance not found: {}", object_id);
       return InternalError::not_found()
         .with_error("object_id", NOT_FOUND_ERROR)
         .into_response();
@@ -152,7 +153,7 @@ pub async fn get_object_by_id(
     }
   };
 
-  axum::Json(Object::from(object_row)).into_response()
+  axum::Json(ObjectInstance::from(object_row)).into_response()
 }
 
 #[utoipa::path(
@@ -177,7 +178,7 @@ pub async fn read_object_by_id(
   let object_row = match repository::object::get_object_by_id(&state.pool, object_id).await {
     Ok(Some(object)) => object,
     Ok(None) => {
-      log::error!("Object not found: {}", object_id);
+      log::error!("ObjectInstance not found: {}", object_id);
       return InternalError::not_found()
         .with_error("object_id", NOT_FOUND_ERROR)
         .into_response();
@@ -245,7 +246,7 @@ pub async fn read_object_by_path(
   let object_row = match repository::object::get_object_by_path(&state.pool, &query.path).await {
     Ok(Some(object)) => object,
     Ok(None) => {
-      log::error!("Object not found: {}", query.path);
+      log::error!("ObjectInstance not found: {}", query.path);
       return InternalError::not_found()
         .with_error("path", NOT_FOUND_ERROR)
         .into_response();
@@ -294,7 +295,7 @@ pub async fn read_object_by_path(
   tags = [OBJECT_TAG],
   request_body = CreateObjectRequest,
   responses(
-    (status = 201, content_type = "application/json", body = Object),
+    (status = 201, content_type = "application/json", body = ObjectInstance),
     (status = 400, content_type = "application/json", body = Errors),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 500, content_type = "application/json", body = Errors),
@@ -321,7 +322,11 @@ pub async fn create_object(
       }
     };
 
-  (StatusCode::CREATED, axum::Json(Object::from(object_row))).into_response()
+  (
+    StatusCode::CREATED,
+    axum::Json(ObjectInstance::from(object_row)),
+  )
+    .into_response()
 }
 
 #[utoipa::path(
@@ -349,7 +354,7 @@ pub async fn append_object(
   let object_row = match repository::object::get_object_by_id(&state.pool, object_id).await {
     Ok(Some(object)) => object,
     Ok(None) => {
-      log::error!("Object not found: {}", object_id);
+      log::error!("ObjectInstance not found: {}", object_id);
       return InternalError::not_found()
         .with_error("object_id", NOT_FOUND_ERROR)
         .into_response();
@@ -423,7 +428,7 @@ pub async fn append_object(
   tags = [OBJECT_TAG],
   request_body = MoveObjectRequest,
   responses(
-    (status = 200, content_type = "application/json", body = Object),
+    (status = 200, content_type = "application/json", body = ObjectInstance),
     (status = 400, content_type = "application/json", body = Errors),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 404, content_type = "application/json", body = Errors),
@@ -449,7 +454,7 @@ pub async fn move_object(
   {
     Ok(Some(object)) => object,
     Ok(None) => {
-      log::error!("Object not found: {}", object_id);
+      log::error!("ObjectInstance not found: {}", object_id);
       return InternalError::not_found()
         .with_error("object_id", NOT_FOUND_ERROR)
         .into_response();
@@ -461,7 +466,7 @@ pub async fn move_object(
         .into_response();
     }
   };
-  axum::Json(Object::from(object_row)).into_response()
+  axum::Json(ObjectInstance::from(object_row)).into_response()
 }
 
 #[utoipa::path(
@@ -487,7 +492,7 @@ pub async fn delete_object(
   match service::object::delete_object(&state.pool, state.config.clone(), object_id).await {
     Ok(Some(_)) => {}
     Ok(None) => {
-      log::error!("Object not found: {}", object_id);
+      log::error!("ObjectInstance not found: {}", object_id);
       return InternalError::not_found()
         .with_error("object_id", NOT_FOUND_ERROR)
         .into_response();
