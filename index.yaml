@@ -3,12 +3,12 @@ entries:
   object-storage-api:
   - apiVersion: v2
     appVersion: latest
-    created: "2025-01-29T12:36:43.940677966Z"
+    created: "2025-01-30T09:30:10.052113769Z"
     description: Aicacia Object Storage API provides blob services for applications.
-    digest: c7a88edc9b728325739c11fe7710dd6ec85521ecc60849c9ecfc061b8d0c15c7
+    digest: e8aded67de90de3adae36c0484247f72f7066ec10bdc65c73c730f4b44850c5f
     name: object-storage-api
     type: application
     urls:
     - object-storage-api-0.1.0.tgz
     version: 0.1.0
-generated: "2025-01-29T12:36:43.93936455Z"
+generated: "2025-01-30T09:30:10.05162206Z"
