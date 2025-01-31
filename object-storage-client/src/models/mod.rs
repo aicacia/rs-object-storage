@@ -12,5 +12,7 @@ pub mod p2_p;
 pub use self::p2_p::P2P;
 pub mod pagination;
 pub use self::pagination::Pagination;
+pub mod upload_response;
+pub use self::upload_response::UploadResponse;
 pub mod version;
 pub use self::version::Version;

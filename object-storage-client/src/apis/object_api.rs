@@ -37,7 +37,7 @@ impl<C: Connect> ObjectApiClient<C>
 }
 
 pub trait ObjectApi: Send + Sync {
-    fn append_object(&self, object_id: i64, part: std::path::PathBuf) -> Pin<Box<dyn Future<Output = Result<i32, Error>> + Send>>;
+    fn append_object(&self, object_id: i64, part: std::path::PathBuf) -> Pin<Box<dyn Future<Output = Result<models::UploadResponse, Error>> + Send>>;
     fn create_object(&self, create_object_request: models::CreateObjectRequest) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
     fn delete_object(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
     fn get_object_by_id(&self, object_id: i64) -> Pin<Box<dyn Future<Output = Result<models::ObjectInstance, Error>> + Send>>;
@@ -51,7 +51,7 @@ pub trait ObjectApi: Send + Sync {
 impl<C: Connect>ObjectApi for ObjectApiClient<C>
     where C: Clone + std::marker::Send + Sync {
     #[allow(unused_mut)]
-    fn append_object(&self, object_id: i64, part: std::path::PathBuf) -> Pin<Box<dyn Future<Output = Result<i32, Error>> + Send>> {
+    fn append_object(&self, object_id: i64, part: std::path::PathBuf) -> Pin<Box<dyn Future<Output = Result<models::UploadResponse, Error>> + Send>> {
         let mut req = __internal_request::Request::new(hyper::Method::PUT, "/objects/{object_id}/append".to_string())
         ;
         req = req.with_path_param("object_id".to_string(), object_id.to_string());

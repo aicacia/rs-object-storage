@@ -348,7 +348,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "type": "integer", "minimum": 0 }
+                "schema": { "$ref": "#/components/schemas/UploadResponse" }
               }
             }
           },
@@ -655,6 +655,11 @@
             "contentMediaType": "application/octet-stream"
           }
         }
+      },
+      "UploadResponse": {
+        "type": "object",
+        "required": ["written"],
+        "properties": { "written": { "type": "integer", "minimum": 0 } }
       },
       "Version": {
         "type": "object",

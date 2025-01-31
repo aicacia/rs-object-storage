@@ -50,6 +50,7 @@ Class | Method | HTTP request | Description
  - [ObjectInstance](docs/ObjectInstance.md)
  - [P2P](docs/P2P.md)
  - [Pagination](docs/Pagination.md)
+ - [UploadResponse](docs/UploadResponse.md)
  - [Version](docs/Version.md)
 
 

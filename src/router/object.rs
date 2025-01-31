@@ -8,7 +8,7 @@ use crate::{
   model::{
     object::{
       CreateObjectRequest, MoveObjectRequest, ObjectInstance, ObjectInstancePagination,
-      ObjectQuery, ObjectsQuery, UploadPartRequest,
+      ObjectQuery, ObjectsQuery, UploadPartRequest, UploadResponse,
     },
     util::{OffsetAndLimit, Pagination},
   },
@@ -335,7 +335,7 @@ pub async fn create_object(
   tags = [OBJECT_TAG],
   request_body(content = UploadPartRequest, content_type = "multipart/form-data"),
   responses(
-    (status = 200, content_type = "application/json", body = usize),
+    (status = 200, content_type = "application/json", body = UploadResponse),
     (status = 400, content_type = "application/json", body = Errors),
     (status = 401, content_type = "application/json", body = Errors),
     (status = 404, content_type = "application/json", body = Errors),
@@ -419,7 +419,7 @@ pub async fn append_object(
       }
     }
   }
-  axum::Json(written).into_response()
+  axum::Json(UploadResponse { written }).into_response()
 }
 
 #[utoipa::path(

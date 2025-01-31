@@ -24,10 +24,14 @@ pub struct CreateObjectRequest {
 }
 
 #[derive(ToSchema)]
-#[allow(unused)]
 pub struct UploadPartRequest {
   #[schema(value_type = String, format = Binary, content_media_type = "application/octet-stream")]
   pub part: Bytes,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct UploadResponse {
+  pub written: usize,
 }
 
 #[derive(Deserialize, ToSchema)]

@@ -18,7 +18,7 @@ Method | HTTP request | Description
 
 ## append_object
 
-> i32 append_object(object_id, part)
+> models::UploadResponse append_object(object_id, part)
 
 
 ### Parameters
@@ -31,7 +31,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-**i32**
+[**models::UploadResponse**](UploadResponse.md)
 
 ### Authorization
 
