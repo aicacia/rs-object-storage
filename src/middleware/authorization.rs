@@ -1,6 +1,7 @@
 use auth_client::apis::JwtApi;
 use axum::extract::{FromRef, FromRequestParts};
 use http::request::Parts;
+use serde::Deserialize;
 
 use crate::{
   core::{
@@ -8,7 +9,7 @@ use crate::{
     openapi::AUTHORIZATION_HEADER,
   },
   router::RouterState,
-  service::auth::{jwt_api_client, Claims},
+  service::auth::jwt_api_client,
 };
 
 pub const TOKEN_TYPE_BEARER: &str = "bearer";
@@ -71,4 +72,19 @@ where
     }
     Err(InternalError::unauthorized().with_error(AUTHORIZATION_HEADER, REQUIRED_ERROR))
   }
+}
+
+#[derive(Debug, Deserialize, Default, Clone)]
+pub struct Claims {
+  pub r#type: String,
+  pub exp: i64,
+  pub iat: i64,
+  pub nbf: i64,
+  pub iss: String,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub aud: Option<String>,
+  pub sub_type: String,
+  pub sub: i64,
+  pub app: i64,
+  pub scopes: Vec<String>,
 }

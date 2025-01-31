@@ -240,7 +240,7 @@ async fn create_p2p_token(config: &Config) -> Result<String, InternalError> {
   let mut auth_p2p_token = AUTH_P2P_TOKEN.write().await;
 
   let (claims, expires_at) = create_p2p_claims(config);
-  let token = auth::create_jwt(config, claims).await?;
+  let token = auth::create_jwt(config, &config.p2p.tenant_client_id, claims).await?;
 
   auth_p2p_token.replace((token.clone(), expires_at));
 
