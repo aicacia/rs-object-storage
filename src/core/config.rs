@@ -39,8 +39,12 @@ pub struct AuthServiceAccountConfig {
 #[derive(Debug, Deserialize)]
 pub struct AuthConfig {
   pub uri: String,
-  pub tenant_client_id: uuid::Uuid,
   pub service_account: AuthServiceAccountConfig,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ObjectStorageConfig {
+  pub tenant_client_id: uuid::Uuid,
 }
 
 #[derive(Debug, Deserialize)]
@@ -48,6 +52,8 @@ pub struct Config {
   pub server: ServerConfig,
   pub database: DatabaseConfig,
   pub p2p: P2PConfig,
+  #[serde(rename = "object-storage")]
+  pub object_storage: ObjectStorageConfig,
   pub auth: AuthConfig,
   pub objects_dir: String,
   pub log_level: String,

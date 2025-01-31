@@ -45,7 +45,7 @@ where
         }
       };
       let claims_value = match jwt_api_client(&state.config, authorization_string)
-        .jwt_is_valid(&state.config.auth.tenant_client_id.to_string())
+        .jwt_is_valid(&state.config.object_storage.tenant_client_id.to_string())
         .await
       {
         Ok(claims_value) => claims_value,
