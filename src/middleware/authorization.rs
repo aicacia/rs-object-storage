@@ -9,7 +9,7 @@ use crate::{
     openapi::AUTHORIZATION_HEADER,
   },
   router::RouterState,
-  service::auth::create_access_token_configuration,
+  service::auth::auth_token_configuration,
 };
 
 pub const TOKEN_TYPE_BEARER: &str = "bearer";
@@ -46,7 +46,7 @@ where
         }
       };
       let claims_value = match jwt_api::jwt_is_valid(
-        &create_access_token_configuration(&state.config, authorization_string),
+        &auth_token_configuration(&state.config, authorization_string),
         &state.config.object_storage.tenant_client_id.to_string(),
       )
       .await

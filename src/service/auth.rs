@@ -17,17 +17,14 @@ lazy_static! {
   static ref SERVICE_ACCOUNT_TOKENS: DashMap<uuid::Uuid, (Token, i64)> = DashMap::new();
 }
 
-pub fn create_access_token_configuration(config: &Config, access_token: &str) -> Configuration {
+pub fn auth_token_configuration(config: &Config, access_token: &str) -> Configuration {
   let mut configuration = Configuration::default();
   configuration.base_path = config.auth.uri.to_owned();
   configuration.oauth_access_token = Some(access_token.to_owned());
   configuration
 }
 
-pub fn create_tenant_configuration(
-  config: &Config,
-  tenant_client_id: &uuid::Uuid,
-) -> Configuration {
+pub fn auth_tenant_configuration(config: &Config, tenant_client_id: &uuid::Uuid) -> Configuration {
   let mut configuration = Configuration::default();
   configuration.base_path = config.auth.uri.to_owned();
   configuration.api_key = Some(ApiKey {
@@ -43,7 +40,7 @@ pub async fn create_jwt(
   claims: HashMap<String, serde_json::Value>,
 ) -> Result<String, InternalError> {
   let service_account_token = get_service_account_token(config, tenant_client_id).await?;
-  let configuration = create_access_token_configuration(config, &service_account_token);
+  let configuration = auth_token_configuration(config, &service_account_token);
   let jwt = match jwt_api::create_jwt(&configuration, claims).await {
     Ok(jwt) => jwt,
     Err(e) => {
@@ -81,7 +78,7 @@ async fn create_service_account_token(
     client_id: config.auth.service_account.client_id,
     client_secret: config.auth.service_account.client_secret,
   });
-  let configuration = create_tenant_configuration(config, tenant_client_id);
+  let configuration = auth_tenant_configuration(config, tenant_client_id);
   match token_api::token(&configuration, token_request).await {
     Ok(token) => Ok(token),
     Err(e) => {
