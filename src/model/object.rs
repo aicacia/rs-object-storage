@@ -1,4 +1,3 @@
-use axum::body::Bytes;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
@@ -25,8 +24,8 @@ pub struct CreateObjectRequest {
 
 #[derive(ToSchema)]
 pub struct UploadPartRequest {
-  #[schema(value_type = String, format = Binary, content_media_type = "application/octet-stream")]
-  pub part: Bytes,
+  #[schema(format = Binary, content_media_type = "application/octet-stream")]
+  pub part: String,
 }
 
 #[derive(Serialize, ToSchema)]

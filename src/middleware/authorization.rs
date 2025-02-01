@@ -1,4 +1,4 @@
-use auth_client::apis::JwtApi;
+use auth_client::apis::jwt_api;
 use axum::extract::{FromRef, FromRequestParts};
 use http::request::Parts;
 use serde::Deserialize;
@@ -9,7 +9,7 @@ use crate::{
     openapi::AUTHORIZATION_HEADER,
   },
   router::RouterState,
-  service::auth::jwt_api_client,
+  service::auth::create_access_token_configuration,
 };
 
 pub const TOKEN_TYPE_BEARER: &str = "bearer";
@@ -45,9 +45,11 @@ where
           );
         }
       };
-      let claims_value = match jwt_api_client(&state.config, authorization_string)
-        .jwt_is_valid(&state.config.object_storage.tenant_client_id.to_string())
-        .await
+      let claims_value = match jwt_api::jwt_is_valid(
+        &create_access_token_configuration(&state.config, authorization_string),
+        &state.config.object_storage.tenant_client_id.to_string(),
+      )
+      .await
       {
         Ok(claims_value) => claims_value,
         Err(e) => {

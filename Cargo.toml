@@ -57,14 +57,6 @@ utoipa = { version = "5.3", default-features = false, features = [
 utoipa-axum = { version = "0.2", default-features = false }
 
 http = { version = "1.2", default-features = false }
-http-body-util = { version = "0.1", default-features = false }
-hyper = { version = "1.5", default-features = false }
-hyper-util = { version = "0.1", default-features = false, features = [
-  "client",
-  "client-legacy",
-  "http1",
-  "http2",
-] }
 tower-http = { version = "0.6", default-features = false, features = [
   "cors",
   "trace",
@@ -104,7 +96,7 @@ chrono = { version = "0.4", default-features = false, features = ["serde"] }
 uuid = { version = "1.11", features = ["serde", "v4"] }
 atomicoption = "0.1"
 
-auth-client = { git = "https://github.com/aicacia/rs-auth.git", rev = "04c49cf" }
+auth-client = { git = "https://github.com/aicacia/rs-auth.git", rev = "123e81b" }
 
 # peer server deps
 webrtc-http = { version = "0.1", features = ["axum"] }

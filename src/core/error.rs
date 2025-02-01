@@ -4,10 +4,8 @@ use axum::{
   http::{header, StatusCode},
   response::{IntoResponse, Response},
 };
-use http_body_util::{BodyExt, Collected};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio::runtime::Handle;
 use utoipa::ToSchema;
 use validator::{ValidationError, ValidationErrors, ValidationErrorsKind};
 
@@ -167,50 +165,6 @@ impl From<async_tungstenite::tungstenite::Error> for InternalError {
 impl From<serde_json::Error> for InternalError {
   fn from(error: serde_json::Error) -> Self {
     Self::internal_error().with_application_error(error.to_string())
-  }
-}
-
-impl From<auth_client::apis::ApiError> for InternalError {
-  fn from(error: auth_client::apis::ApiError) -> Self {
-    let code = error.code;
-    let body = error.body;
-    let body_string = tokio::task::block_in_place(move || {
-      Handle::current().block_on(async move {
-        let bytes = body
-          .collect()
-          .await
-          .into_iter()
-          .map(Collected::to_bytes)
-          .flatten()
-          .collect::<Vec<u8>>();
-        String::from_utf8_lossy(&bytes).to_string()
-      })
-    });
-    Self::internal_error().with_application_error(format!("{code}: {body_string}"))
-  }
-}
-
-impl From<auth_client::apis::Error> for InternalError {
-  fn from(error: auth_client::apis::Error) -> Self {
-    match error {
-      auth_client::apis::Error::Api(api_error) => Self::from(api_error),
-      auth_client::apis::Error::Header(_header_error) => {
-        Self::internal_error().with_error("header", INVALID_ERROR)
-      }
-      auth_client::apis::Error::Http(http_error) => {
-        Self::internal_error().with_application_error(http_error.to_string())
-      }
-      auth_client::apis::Error::Hyper(hyper_error) => {
-        Self::internal_error().with_application_error(hyper_error.to_string())
-      }
-      auth_client::apis::Error::HyperClient(client_error) => {
-        Self::internal_error().with_application_error(client_error.to_string())
-      }
-      auth_client::apis::Error::Serde(serde_error) => Self::from(serde_error),
-      auth_client::apis::Error::UriError(uri_error) => {
-        Self::internal_error().with_application_error(uri_error.to_string())
-      }
-    }
   }
 }
 

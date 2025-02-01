@@ -4,15 +4,15 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**append_object**](ObjectApi.md#append_object) | **Put** /objects/{object_id}/append | 
-[**create_object**](ObjectApi.md#create_object) | **Post** /objects | 
-[**delete_object**](ObjectApi.md#delete_object) | **Delete** /objects/{object_id} | 
-[**get_object_by_id**](ObjectApi.md#get_object_by_id) | **Get** /objects/{object_id} | 
-[**get_object_by_path**](ObjectApi.md#get_object_by_path) | **Get** /objects/by-path | 
-[**get_objects**](ObjectApi.md#get_objects) | **Get** /objects | 
-[**move_object**](ObjectApi.md#move_object) | **Put** /objects/{object_id}/move | 
-[**read_object_by_id**](ObjectApi.md#read_object_by_id) | **Get** /objects/{object_id}/read | 
-[**read_object_by_path**](ObjectApi.md#read_object_by_path) | **Get** /objects/by-path/read | 
+[**append_object**](ObjectApi.md#append_object) | **PUT** /objects/{object_id}/append | 
+[**create_object**](ObjectApi.md#create_object) | **POST** /objects | 
+[**delete_object**](ObjectApi.md#delete_object) | **DELETE** /objects/{object_id} | 
+[**get_object_by_id**](ObjectApi.md#get_object_by_id) | **GET** /objects/{object_id} | 
+[**get_object_by_path**](ObjectApi.md#get_object_by_path) | **GET** /objects/by-path | 
+[**get_objects**](ObjectApi.md#get_objects) | **GET** /objects | 
+[**move_object**](ObjectApi.md#move_object) | **PUT** /objects/{object_id}/move | 
+[**read_object_by_id**](ObjectApi.md#read_object_by_id) | **GET** /objects/{object_id}/read | 
+[**read_object_by_path**](ObjectApi.md#read_object_by_path) | **GET** /objects/by-path/read | 
 
 
 
