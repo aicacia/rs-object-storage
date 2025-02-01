@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use async_tungstenite::tokio::connect_async;
+use auth_client::apis::jwt_api;
 use dashmap::DashMap;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
@@ -19,7 +20,7 @@ use webrtc_p2p::{peer::SignalMessage, Peer, PeerOptions};
 
 use crate::core::{config::Config, error::InternalError};
 
-use super::auth;
+use super::auth::{auth_token_configuration, get_service_account_token};
 
 pub async fn serve_peer(
   router: axum::Router,
@@ -240,9 +241,32 @@ async fn create_p2p_token(config: &Config) -> Result<String, InternalError> {
   let mut auth_p2p_token = AUTH_P2P_TOKEN.write().await;
 
   let (claims, expires_at) = create_p2p_claims(config);
-  let token = auth::create_jwt(config, &config.p2p.tenant_client_id, claims).await?;
+  let token = create_jwt(config, &config.p2p.tenant_client_id, claims).await?;
 
   auth_p2p_token.replace((token.clone(), expires_at));
 
   Ok(token)
+}
+
+async fn create_jwt(
+  config: &Config,
+  tenant_client_id: &uuid::Uuid,
+  claims: HashMap<String, serde_json::Value>,
+) -> Result<String, InternalError> {
+  let service_account_token = match get_service_account_token(config, tenant_client_id).await {
+    Ok(token) => token,
+    Err(e) => {
+      log::info!("Error getting service account token: {:?}", e);
+      return Err(InternalError::internal_error());
+    }
+  };
+  let configuration = auth_token_configuration(config, &service_account_token);
+  let jwt = match jwt_api::create_jwt(&configuration, claims).await {
+    Ok(jwt) => jwt,
+    Err(e) => {
+      log::info!("Error creating JWT: {:?}", e);
+      return Err(InternalError::internal_error());
+    }
+  };
+  Ok(jwt.access_token)
 }
