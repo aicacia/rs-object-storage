@@ -20,7 +20,7 @@ pub struct ObjectInstance {
     #[serde(rename = "path")]
     pub path: String,
     #[serde(rename = "size")]
-    pub size: i64,
+    pub size: u64,
     #[serde(rename = "type", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub r#type: Option<Option<String>>,
     #[serde(rename = "updated_at")]
@@ -28,7 +28,7 @@ pub struct ObjectInstance {
 }
 
 impl ObjectInstance {
-    pub fn new(created_at: String, id: i64, path: String, size: i64, updated_at: String) -> ObjectInstance {
+    pub fn new(created_at: String, id: i64, path: String, size: u64, updated_at: String) -> ObjectInstance {
         ObjectInstance {
             created_at,
             id,

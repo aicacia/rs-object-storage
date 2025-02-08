@@ -1,6 +1,5 @@
 pub mod object;
 pub mod openapi;
-pub mod p2p;
 pub mod util;
 
 use std::sync::Arc;
@@ -8,7 +7,6 @@ use std::sync::Arc;
 use axum::Router;
 use object::OBJECT_TAG;
 use openapi::OPENAPI_TAG;
-use p2p::P2P_TAG;
 use sqlx::AnyPool;
 use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLayer};
 use util::UTIL_TAG;
@@ -35,7 +33,6 @@ unsafe impl Sync for RouterState {}
   tags(
     (name = OBJECT_TAG, description = "Object endpoints"),
     (name = UTIL_TAG, description = "Utility endpoints"),
-    (name = P2P_TAG, description = "P2P endpoints"),
     (name = OPENAPI_TAG, description = "OpenApi endpoints"),
   ),
   modifiers(&SecurityAddon)
@@ -49,7 +46,6 @@ pub fn create_router(state: RouterState) -> Router {
 
   let open_api_router = OpenApiRouter::with_openapi(ApiDoc::openapi())
     .merge(object::create_router(state.clone()))
-    .merge(p2p::create_router(state.clone()))
     .merge(util::create_router(state.clone()));
 
   let openapi = open_api_router.get_openapi().clone();

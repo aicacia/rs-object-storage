@@ -21,16 +21,6 @@ pub struct DatabaseConfig {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct P2PConfig {
-  pub enabled: bool,
-  pub tenant_client_id: uuid::Uuid,
-  pub ws_uri: String,
-  pub api_uri: String,
-  pub id: String,
-  pub password: String,
-}
-
-#[derive(Debug, Deserialize)]
 pub struct AuthServiceAccountConfig {
   pub client_id: uuid::Uuid,
   pub client_secret: uuid::Uuid,
@@ -51,7 +41,6 @@ pub struct ObjectStorageConfig {
 pub struct Config {
   pub server: ServerConfig,
   pub database: DatabaseConfig,
-  pub p2p: P2PConfig,
   #[serde(rename = "object-storage")]
   pub object_storage: ObjectStorageConfig,
   pub auth: AuthConfig,
@@ -77,12 +66,6 @@ impl Config {
       .set_default("database.acquire_timeout", 3)?
       .set_default("database.idle_timeout", 5)?
       .set_default("database.max_lifetime", 300)?
-      // P2P
-      .set_default("p2p.enabled", true)?
-      .set_default("p2p.ws_uri", "wss://p2p.aicacia.com".to_owned())?
-      .set_default("p2p.api_uri", "https://p2p.aicacia.com".to_owned())?
-      .set_default("p2p.id", uuid::Uuid::new_v4().to_string())?
-      .set_default("p2p.password", uuid::Uuid::new_v4().to_string())?
       // Auth
       .set_default("auth.uri", "https://api.auth.aicacia.com".to_owned())?
       // Defaults

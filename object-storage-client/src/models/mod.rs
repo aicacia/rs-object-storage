@@ -8,8 +8,6 @@ pub mod move_object_request;
 pub use self::move_object_request::MoveObjectRequest;
 pub mod object_instance;
 pub use self::object_instance::ObjectInstance;
-pub mod p2_p;
-pub use self::p2_p::P2P;
 pub mod pagination;
 pub use self::pagination::Pagination;
 pub mod upload_response;

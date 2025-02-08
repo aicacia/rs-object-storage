@@ -14,11 +14,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UploadResponse {
     #[serde(rename = "written")]
-    pub written: i32,
+    pub written: u32,
 }
 
 impl UploadResponse {
-    pub fn new(written: i32) -> UploadResponse {
+    pub fn new(written: u32) -> UploadResponse {
         UploadResponse {
             written,
         }

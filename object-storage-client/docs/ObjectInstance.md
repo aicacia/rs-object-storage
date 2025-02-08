@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **created_at** | **String** |  | 
 **id** | **i64** |  | 
 **path** | **String** |  | 
-**size** | **i64** |  | 
+**size** | **u64** |  | 
 **r#type** | Option<**String**> |  | [optional]
 **updated_at** | **String** |  | 
 

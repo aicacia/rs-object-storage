@@ -258,7 +258,7 @@ pub async fn get_object_by_path(configuration: &configuration::Configuration, pa
     }
 }
 
-pub async fn get_objects(configuration: &configuration::Configuration, offset: Option<i32>, limit: Option<i32>, path: Option<&str>) -> Result<models::Pagination, Error<GetObjectsError>> {
+pub async fn get_objects(configuration: &configuration::Configuration, offset: Option<u32>, limit: Option<u32>, path: Option<&str>) -> Result<models::Pagination, Error<GetObjectsError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_offset = offset;
     let p_limit = limit;

@@ -36,7 +36,6 @@ Class | Method | HTTP request | Description
 *ObjectApi* | [**read_object_by_id**](docs/ObjectApi.md#read_object_by_id) | **GET** /objects/{object_id}/read | 
 *ObjectApi* | [**read_object_by_path**](docs/ObjectApi.md#read_object_by_path) | **GET** /objects/by-path/read | 
 *OpenapiApi* | [**get_openapi**](docs/OpenapiApi.md#get_openapi) | **GET** /openapi.json | 
-*P2pApi* | [**p2p**](docs/P2pApi.md#p2p) | **GET** /p2p | 
 *UtilApi* | [**health**](docs/UtilApi.md#health) | **GET** /health | 
 *UtilApi* | [**version**](docs/UtilApi.md#version) | **GET** /version | 
 
@@ -48,7 +47,6 @@ Class | Method | HTTP request | Description
  - [Health](docs/Health.md)
  - [MoveObjectRequest](docs/MoveObjectRequest.md)
  - [ObjectInstance](docs/ObjectInstance.md)
- - [P2P](docs/P2P.md)
  - [Pagination](docs/Pagination.md)
  - [UploadResponse](docs/UploadResponse.md)
  - [Version](docs/Version.md)

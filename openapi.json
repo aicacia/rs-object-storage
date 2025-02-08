@@ -3,7 +3,9 @@
   "info": {
     "title": "object-storage",
     "description": "Aicacia Object Storage API provides blob services for applications.",
-    "contact": { "name": "nathanfaucett@gmail.com" },
+    "contact": {
+      "name": "nathanfaucett@gmail.com"
+    },
     "license": {
       "name": "MIT OR Apache-2.0",
       "identifier": "https://spdx.org/licenses/MIT.html"
@@ -13,14 +15,18 @@
   "paths": {
     "/health": {
       "get": {
-        "tags": ["util"],
+        "tags": [
+          "util"
+        ],
         "operationId": "health",
         "responses": {
           "200": {
             "description": "Health check response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Health" }
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
               }
             }
           },
@@ -28,7 +34,9 @@
             "description": "Health check response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Health" }
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
               }
             }
           }
@@ -37,26 +45,45 @@
     },
     "/objects": {
       "get": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "get_objects",
         "parameters": [
           {
             "name": "offset",
             "in": "query",
             "required": false,
-            "schema": { "type": ["integer", "null"], "minimum": 0 }
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": { "type": ["integer", "null"], "minimum": 0 }
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
           },
           {
             "name": "path",
             "in": "query",
             "required": false,
-            "schema": { "type": ["string", "null"] }
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           }
         ],
         "responses": {
@@ -64,7 +91,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Pagination" }
+                "schema": {
+                  "$ref": "#/components/schemas/Pagination"
+                }
               }
             }
           },
@@ -72,7 +101,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -80,20 +111,30 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       },
       "post": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "create_object",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateObjectRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/CreateObjectRequest"
+              }
             }
           },
           "required": true
@@ -103,7 +144,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInstance"
+                }
               }
             }
           },
@@ -111,7 +154,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -119,7 +164,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -127,24 +174,34 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/objects/by-path": {
       "get": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "get_object_by_path",
         "parameters": [
           {
             "name": "path",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -152,7 +209,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInstance"
+                }
               }
             }
           },
@@ -160,7 +219,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -168,7 +229,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -176,33 +239,50 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/objects/by-path/read": {
       "get": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "read_object_by_path",
         "parameters": [
           {
             "name": "path",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "", "content": { "*/*": {} } },
+          "200": {
+            "description": "",
+            "content": {
+              "*/*": {}
+            }
+          },
           "401": {
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -210,7 +290,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -218,24 +300,35 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/objects/{object_id}": {
       "get": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "get_object_by_id",
         "parameters": [
           {
             "name": "object_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -243,7 +336,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInstance"
+                }
               }
             }
           },
@@ -251,7 +346,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -259,7 +356,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -267,31 +366,46 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       },
       "delete": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "delete_object",
         "parameters": [
           {
             "name": "object_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
-          "204": { "description": "" },
+          "204": {
+            "description": ""
+          },
           "400": {
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -299,7 +413,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -307,7 +423,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -315,30 +433,43 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/objects/{object_id}/append": {
       "put": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "append_object",
         "parameters": [
           {
             "name": "object_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
-              "schema": { "$ref": "#/components/schemas/UploadPartRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/UploadPartRequest"
+              }
             }
           },
           "required": true
@@ -348,7 +479,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UploadResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
               }
             }
           },
@@ -356,7 +489,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -364,7 +499,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -372,7 +509,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -380,30 +519,43 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/objects/{object_id}/move": {
       "put": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "move_object",
         "parameters": [
           {
             "name": "object_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/MoveObjectRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/MoveObjectRequest"
+              }
             }
           },
           "required": true
@@ -413,7 +565,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ObjectInstance" }
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectInstance"
+                }
               }
             }
           },
@@ -421,7 +575,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -429,7 +585,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -437,7 +595,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -445,33 +605,51 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/objects/{object_id}/read": {
       "get": {
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "operationId": "read_object_by_id",
         "parameters": [
           {
             "name": "object_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer", "format": "int64" }
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "", "content": { "*/*": {} } },
+          "200": {
+            "description": "",
+            "content": {
+              "*/*": {}
+            }
+          },
           "401": {
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -479,7 +657,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           },
@@ -487,72 +667,47 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
+                "schema": {
+                  "$ref": "#/components/schemas/HashMap"
+                }
               }
             }
           }
         },
-        "security": [{ "Authorization": [] }]
+        "security": [
+          {
+            "Authorization": []
+          }
+        ]
       }
     },
     "/openapi.json": {
       "get": {
-        "tags": ["openapi"],
+        "tags": [
+          "openapi"
+        ],
         "operationId": "get_openapi",
-        "responses": { "200": { "description": "OpenApi documenation" } }
-      }
-    },
-    "/p2p": {
-      "get": {
-        "tags": ["p2p"],
-        "operationId": "p2p",
         "responses": {
           "200": {
-            "description": "P2P response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/P2P" }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HashMap" }
-              }
-            }
+            "description": "OpenApi documenation"
           }
-        },
-        "security": [{ "Authorization": [] }]
+        }
       }
     },
     "/version": {
       "get": {
-        "tags": ["util"],
+        "tags": [
+          "util"
+        ],
         "operationId": "version",
         "responses": {
           "200": {
             "description": "Version response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Version" }
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
               }
             }
           }
@@ -564,21 +719,37 @@
     "schemas": {
       "CreateObjectRequest": {
         "type": "object",
-        "required": ["path"],
+        "required": [
+          "path"
+        ],
         "properties": {
-          "path": { "type": "string" },
-          "type": { "type": ["string", "null"] }
+          "path": {
+            "type": "string"
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "ErrorMessage": {
         "type": "object",
-        "required": ["code", "parameters"],
+        "required": [
+          "code",
+          "parameters"
+        ],
         "properties": {
-          "code": { "type": "string" },
+          "code": {
+            "type": "string"
+          },
           "parameters": {
             "type": "object",
             "additionalProperties": {},
-            "propertyNames": { "type": "string" }
+            "propertyNames": {
+              "type": "string"
+            }
           }
         }
       },
@@ -586,68 +757,103 @@
         "type": "object",
         "additionalProperties": {
           "type": "array",
-          "items": { "$ref": "#/components/schemas/ErrorMessage" }
+          "items": {
+            "$ref": "#/components/schemas/ErrorMessage"
+          }
         },
-        "propertyNames": { "type": "string" }
+        "propertyNames": {
+          "type": "string"
+        }
       },
       "Health": {
         "type": "object",
-        "required": ["db"],
-        "properties": { "db": { "type": "boolean" } }
+        "required": [
+          "db"
+        ],
+        "properties": {
+          "db": {
+            "type": "boolean"
+          }
+        }
       },
       "MoveObjectRequest": {
         "type": "object",
-        "required": ["path"],
+        "required": [
+          "path"
+        ],
         "properties": {
-          "path": { "type": "string" },
-          "type": { "type": ["string", "null"] }
+          "path": {
+            "type": "string"
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       },
       "ObjectInstance": {
         "type": "object",
-        "required": ["id", "path", "size", "updated_at", "created_at"],
-        "properties": {
-          "created_at": { "type": "string", "format": "date-time" },
-          "id": { "type": "integer", "format": "int64" },
-          "path": { "type": "string" },
-          "size": { "type": "integer", "format": "int64", "minimum": 0 },
-          "type": { "type": ["string", "null"] },
-          "updated_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "P2P": {
-        "type": "object",
         "required": [
-          "enabled",
-          "tenant_client_id",
-          "ws_uri",
-          "api_uri",
           "id",
-          "password"
+          "path",
+          "size",
+          "updated_at",
+          "created_at"
         ],
         "properties": {
-          "api_uri": { "type": "string" },
-          "enabled": { "type": "boolean" },
-          "id": { "type": "string" },
-          "password": { "type": "string" },
-          "tenant_client_id": { "type": "string", "format": "uuid" },
-          "ws_uri": { "type": "string" }
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "path": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "Pagination": {
         "type": "object",
-        "required": ["has_more", "items"],
+        "required": [
+          "has_more",
+          "items"
+        ],
         "properties": {
-          "has_more": { "type": "boolean" },
+          "has_more": {
+            "type": "boolean"
+          },
           "items": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/ObjectInstance" }
+            "items": {
+              "$ref": "#/components/schemas/ObjectInstance"
+            }
           }
         }
       },
       "UploadPartRequest": {
         "type": "object",
-        "required": ["part"],
+        "required": [
+          "part"
+        ],
         "properties": {
           "part": {
             "type": "string",
@@ -658,15 +864,30 @@
       },
       "UploadResponse": {
         "type": "object",
-        "required": ["written"],
-        "properties": { "written": { "type": "integer", "minimum": 0 } }
+        "required": [
+          "written"
+        ],
+        "properties": {
+          "written": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
       },
       "Version": {
         "type": "object",
-        "required": ["version", "build"],
+        "required": [
+          "version",
+          "build"
+        ],
         "properties": {
-          "build": { "type": "string", "format": "date-time" },
-          "version": { "type": "string" }
+          "build": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string"
+          }
         }
       }
     },
@@ -679,9 +900,17 @@
     }
   },
   "tags": [
-    { "name": "object", "description": "Object endpoints" },
-    { "name": "util", "description": "Utility endpoints" },
-    { "name": "p2p", "description": "P2P endpoints" },
-    { "name": "openapi", "description": "OpenApi endpoints" }
+    {
+      "name": "object",
+      "description": "Object endpoints"
+    },
+    {
+      "name": "util",
+      "description": "Utility endpoints"
+    },
+    {
+      "name": "openapi",
+      "description": "OpenApi endpoints"
+    }
   ]
 }

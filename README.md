@@ -150,5 +150,6 @@ helm delete -n api object-storage-api
 
 ```bash
 rm -rf object-storage-client && \
-npx @openapitools/openapi-generator-cli generate -i ./openapi.json -g rust -o 'object-storage-client' --additional-properties=packageName=object-storage-client,library=reqwest,avoidBoxedModels=true
+npx @openapitools/openapi-generator-cli generate -i ./openapi.json -g rust -o 'object-storage-client' --additional-properties=packageName=object-storage-client,library=reqwest,avoidBoxedModels=true,preferUnsignedInt=true,bestFitInt=true
+# set auth-client/Cargo.toml reqwest default-features = false
 ```

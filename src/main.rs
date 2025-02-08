@@ -9,7 +9,6 @@ use object_storage::{
     error::InternalError,
   },
   router::{create_router, RouterState},
-  service::peer::serve_peer,
 };
 use tokio::fs::create_dir_all;
 use tokio_util::sync::CancellationToken;
@@ -61,15 +60,6 @@ async fn main() -> Result<(), InternalError> {
     config.clone(),
     cancellation_token.clone(),
   ));
-  let serve_peer_handle = if config.p2p.enabled {
-    Some(tokio::spawn(serve_peer(
-      router,
-      config.clone(),
-      cancellation_token.clone(),
-    )))
-  } else {
-    None
-  };
 
   shutdown_signal(cancellation_token).await;
 
@@ -77,14 +67,6 @@ async fn main() -> Result<(), InternalError> {
     Ok(_) => {}
     Err(e) => {
       log::error!("Error serving: {}", e);
-    }
-  }
-  if let Some(handle) = serve_peer_handle {
-    match handle.await {
-      Ok(_) => {}
-      Err(e) => {
-        log::error!("Error serving peer: {}", e);
-      }
     }
   }
   match close_pool().await {

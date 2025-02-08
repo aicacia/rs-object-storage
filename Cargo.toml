@@ -95,24 +95,9 @@ build-time = { version = "0.1", default-features = false }
 chrono = { version = "0.4", default-features = false, features = ["serde"] }
 uuid = { version = "1.11", features = ["serde", "v4"] }
 atomicoption = "0.1"
-
-auth-client = { git = "https://github.com/aicacia/rs-auth.git", rev = "123e81b" }
-
-# peer server deps
-webrtc-http = { version = "0.1", features = ["axum"] }
-webrtc-p2p = "0.1"
-webrtc = { version = "0.12", default-features = false }
-async-tungstenite = { version = "0.28", default-features = false, features = [
-  "tokio-runtime",
-  "tokio-rustls-native-certs",
-] }
-urlencoding = { version = "2.1", default-features = false }
 dashmap = { version = "6.1", default-features = false }
 
-[dev-dependencies]
-
-[workspace]
-members = ["object-storage-client"]
+auth-client = { git = "https://github.com/aicacia/rs-auth.git", rev = "7944d85" }
 
 [profile.dev]
 opt-level = 1
