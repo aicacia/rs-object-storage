@@ -19,7 +19,7 @@ lazy_static! {
 pub fn auth_token_configuration(config: &Config, access_token: &str) -> Configuration {
   let mut configuration = Configuration::default();
   configuration.base_path = config.auth.uri.to_owned();
-  configuration.oauth_access_token = Some(access_token.to_owned());
+  configuration.bearer_access_token = Some(access_token.to_owned());
   configuration
 }
 
